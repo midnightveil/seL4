@@ -86,6 +86,12 @@ elseif(KernelArchARM)
         message(FATAL_ERROR "unknown ARM KernelSel4Arch '${KernelSel4Arch}'")
     endif()
 
+elseif(KernelArchARM-M)
+    # https://doc.rust-lang.org/nightly/rustc/platform-support/thumbv7em-none-eabi.html
+
+    # m4f isn't a CPU.
+    string(APPEND c_common_flags " -mcpu=cortex-m4")
+
 elseif(KernelArchRiscV)
     # The "RISC-V Instruction Set Manual, Volume I: RISC-V User-Level ISA",
     # chapter "ISA Extension Naming Conventions" describes the march string. Its
@@ -296,6 +302,10 @@ elseif(KernelArchARM)
     else()
         message(FATAL_ERROR "unknown ARM KernelSel4Arch '${KernelSel4Arch}'")
     endif()
+
+elseif(KernelArchARM-M)
+    KernelCommonFlags(-mfloat-abi=soft)
+
 
 elseif(KernelArchRiscV)
     # Group "small" data objects together in a small-data section so they can

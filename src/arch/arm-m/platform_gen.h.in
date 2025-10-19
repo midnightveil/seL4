@@ -1,0 +1,20 @@
+/*
+ * Copyright 2025, Julia V
+ *
+ * SPDX-License-Identifier: GPL-2.0-only
+ */
+
+#pragma once
+
+#include <config.h>
+
+#define TIMER_CLOCK_HZ ULL_CONST(@CONFIGURE_TIMER_FREQUENCY@)
+
+// enum IRQConstants {
+//     maxIRQ                      = @CONFIGURE_MAX_IRQ@
+// };
+
+#define IRQ_CNODE_SLOT_BITS (@CONFIGURE_IRQ_SLOT_BITS@)
+
+#include <@CONFIGURE_INTERRUPT_CONTROLLER@>
+#include <@CONFIGURE_TIMER@>
