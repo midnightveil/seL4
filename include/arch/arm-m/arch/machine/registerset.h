@@ -1,6 +1,7 @@
 #pragma once
 
 #include <arch/types.h>
+#include <sel4/sel4_arch/constants.h>
 
 enum _register {
     pc = 0, R15 = 0,
