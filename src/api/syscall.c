@@ -248,6 +248,7 @@ exception_t handleUserLevelFault(word_t w_a, word_t w_b)
     return EXCEPTION_NONE;
 }
 
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
 exception_t handleVMFaultEvent(vm_fault_type_t vm_faultType)
 {
     MCS_DO_IF_BUDGET({
@@ -264,6 +265,7 @@ exception_t handleVMFaultEvent(vm_fault_type_t vm_faultType)
 
     return EXCEPTION_NONE;
 }
+#endif
 
 #ifdef CONFIG_KERNEL_MCS
 static exception_t handleInvocation(bool_t isCall, bool_t isBlocking, bool_t canDonate, bool_t firstPhase, cptr_t cptr)

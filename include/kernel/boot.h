@@ -116,6 +116,8 @@ typedef struct {
 
 extern rootserver_mem_t rootserver;
 
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
+
 /* get the number of paging structures required to cover it_v_reg, with
  * the paging structure covering `bits` of the address range - for a 4k page
  * `bits` would be 12 */
@@ -137,6 +139,8 @@ static inline BOOT_CODE pptr_t it_alloc_paging(void)
 
 /* return the amount of paging structures required to cover v_reg */
 word_t arch_get_n_paging(v_region_t it_veg);
+
+#endif
 
 #if defined(CONFIG_DEBUG_BUILD) && defined(ENABLE_SMP_SUPPORT) && defined(CONFIG_KERNEL_MCS) && !defined(CONFIG_PLAT_QEMU_ARM_VIRT)
 /* Test whether clocks are synchronised across nodes */

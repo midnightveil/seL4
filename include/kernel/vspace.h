@@ -6,7 +6,10 @@
 #pragma once
 
 #include <config.h>
+
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
 #include <arch/kernel/vspace.h>
+#endif
 
 #ifdef CONFIG_KERNEL_LOG_BUFFER
 exception_t benchmark_arch_map_logBuffer(word_t frame_cptr);

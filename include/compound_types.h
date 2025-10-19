@@ -11,6 +11,7 @@
 #include <object/structures.h>
 #include <arch/types.h>
 
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
 struct pde_range {
     pde_t *base;
     word_t length;
@@ -22,6 +23,7 @@ struct pte_range {
     word_t length;
 };
 typedef struct pte_range pte_range_t;
+#endif
 
 typedef cte_t *cte_ptr_t;
 

@@ -768,7 +768,9 @@ static exception_t decodeUnsetBreakpoint(cap_t cap, word_t *buffer)
 
 static exception_t invokeSetTLSBase(tcb_t *thread, word_t tls_base)
 {
-    setRegister(thread, TLS_BASE, tls_base);
+    // TODO.
+    assert(false);
+    // setRegister(thread, TLS_BASE, tls_base);
     if (thread == NODE_STATE(ksCurThread)) {
         /* If this is the current thread force a reschedule to ensure that any changes
          * to the TLS_BASE are realized */
@@ -1182,11 +1184,14 @@ exception_t decodeTCBConfigure(cap_t cap, word_t length, cte_t *slot, word_t *bu
     }
     vRootCap = dc_ret.cap;
 
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
+    // TODO.
     if (!isValidVTableRoot(vRootCap)) {
         userError("TCB Configure: VSpace cap is invalid.");
         current_syscall_error.type = seL4_IllegalOperation;
         return EXCEPTION_SYSCALL_ERROR;
     }
+#endif
 
     setThreadState(NODE_STATE(ksCurThread), ThreadState_Restart);
 #ifdef CONFIG_KERNEL_MCS
@@ -1585,11 +1590,14 @@ exception_t decodeSetSpace(cap_t cap, word_t length, cte_t *slot, word_t *buffer
     }
     vRootCap = dc_ret.cap;
 
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
+    // TODO
     if (!isValidVTableRoot(vRootCap)) {
         userError("TCB SetSpace: Invalid VSpace cap.");
         current_syscall_error.type = seL4_IllegalOperation;
         return EXCEPTION_SYSCALL_ERROR;
     }
+#endif
 
 #ifdef CONFIG_KERNEL_MCS
     /* fault handler */

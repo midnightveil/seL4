@@ -15,3 +15,11 @@ typedef word_t cptr_t;
 typedef word_t node_id_t;
 typedef word_t cpu_id_t;
 typedef word_t dom_t;
+
+/* TODO: Is this needed? */
+typedef struct kernel_frame {
+    paddr_t paddr;
+    pptr_t pptr;
+    int armExecuteNever;
+    int userAvailable;
+} kernel_frame_t;
