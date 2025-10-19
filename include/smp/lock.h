@@ -11,10 +11,10 @@
 #include <util.h>
 #include <mode/machine.h>
 #include <arch/model/statedata.h>
-#include <smp/ipi.h>
 #include <util.h>
 
 #ifdef ENABLE_SMP_SUPPORT
+#include <smp/ipi.h>
 
 /* CLH lock is FIFO lock for machines with coherent caches (coherent-FIFO lock).
  * See ftp://ftp.cs.washington.edu/tr/1993/02/UW-CSE-93-02-02.pdf */

@@ -25,7 +25,9 @@
 #include <util.h>
 #include <string.h>
 #include <stdint.h>
+#ifdef CONFIG_ENABLE_SMP_SUPPORT
 #include <arch/smp/ipi_inline.h>
+#endif
 
 #define NULL_PRIO 0
 
