@@ -18,7 +18,9 @@
 #include <kernel/thread.h>
 #include <model/statedata.h>
 #include <machine/timer.h>
+#ifdef CONFIG_ENABLE_SMP_SUPPORT
 #include <smp/ipi.h>
+#endif
 
 exception_t decodeIRQControlInvocation(word_t invLabel, word_t length,
                                        cte_t *srcSlot, word_t *buffer)

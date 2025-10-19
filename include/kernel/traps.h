@@ -9,7 +9,9 @@
 #include <config.h>
 #include <util.h>
 #include <arch/kernel/traps.h>
+#ifdef CONFIG_ENABLE_SMP_SUPPORT
 #include <smp/lock.h>
+#endif
 
 /* This C function should be the first thing called from C after entry from
  * assembly. It provides a single place to do any entry work that is not

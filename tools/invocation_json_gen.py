@@ -7,6 +7,7 @@
 
 import argparse
 import json
+import sys
 import xml.dom.minidom
 from condition import condition_to_bool
 
