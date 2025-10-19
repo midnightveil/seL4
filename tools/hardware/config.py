@@ -71,7 +71,7 @@ class RISCVConfig(Config):
 
 def get_arch_config(sel4arch: str, addrspace_max: int) -> Config:
     ''' Return an appropriate Config object for the given architecture '''
-    if sel4arch in ['aarch32', 'aarch64', 'arm_hyp']:
+    if sel4arch in ['aarch32', 'aarch64', 'arm_hyp', 'arm-m']: # XXX: really?
         return ARMConfig(sel4arch, addrspace_max)
     elif sel4arch in ['riscv32', 'riscv64']:
         return RISCVConfig(sel4arch, addrspace_max)

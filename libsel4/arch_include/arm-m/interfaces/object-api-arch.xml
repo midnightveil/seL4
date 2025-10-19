@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+
+<api name="ObjectApiArm-M" label_prefix="arm-m">
+    <!-- Per https://documentation-service.arm.com/static/606dc36485368c4c2b1bf62f?token=
+        DDI0403E_e_armv7m_arm.pdf Arm v7-M Architecture Reference Manual
+        ARM DDI 0403E.e
+     -->
+    <struct name="seL4_UserContext">
+        <member name="pc"/> <!-- r15 (program counter) -->
+        <member name="lr"/> <!-- r14 (link register) -->
+        <member name="psp"/> <!-- r13 (process stack pointer) -->
+
+        <!-- general purpose registers -->
+        <member name="r12"/>
+        <member name="r11"/>
+        <member name="r10"/>
+        <member name="r9"/>
+        <member name="r8"/>
+        <member name="r7"/>
+        <member name="r6"/>
+        <member name="r5"/>
+        <member name="r4"/>
+        <member name="r3"/>
+        <member name="r2"/>
+        <member name="r1"/>
+        <member name="r0"/>
+
+        <member name="apsr"/> <!-- application program status register -->
+    </struct>
+</api>

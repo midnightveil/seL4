@@ -578,7 +578,7 @@ if(DEFINED KernelDTSList AND (NOT "${KernelDTSList}" STREQUAL ""))
                 --compat-strings-out "${compatibility_outfile}" --c-header --header-out
                 "${device_dest}" --hardware-config "${config_file}" --hardware-schema
                 "${config_schema}" --yaml --yaml-out "${platform_yaml}" --sel4arch
-                "${KernelSel4Arch}" --addrspace-max "${KernelPaddrUserTop}" --json --json-out
+                "${KernelSel4Arch}" --json --json-out
                 "${platform_json}" --kernel-config-flags "CONFIG_PRINTING=${KernelPrinting}"
                 "CONFIG_ARM_HYPERVISOR_SUPPORT=${KernelArmHypervisorSupport}"
                 "CONFIG_ARM_SMMU=${KernelArmSMMU}" "CONFIG_TK1_SMMU=${KernelTk1SMMU}"
