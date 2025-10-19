@@ -32,10 +32,12 @@ typedef struct dschedule {
     word_t length;
 } dschedule_t;
 
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
 enum asidSizeConstants {
     asidHighBits = seL4_NumASIDPoolsBits,
     asidLowBits = seL4_ASIDPoolIndexBits
 };
+#endif
 
 /* Arch-independent object types */
 enum endpoint_state {
@@ -209,6 +211,8 @@ typedef word_t tcb_cnode_index_t;
 
 #include <arch/object/structures.h>
 
+// TEMPORARY.
+#if 0
 struct user_data {
     word_t words[BIT(seL4_PageBits) / sizeof(word_t)];
 };
@@ -218,7 +222,9 @@ struct user_data_device {
     word_t words[BIT(seL4_PageBits) / sizeof(word_t)];
 };
 typedef struct user_data_device user_data_device_t;
+#endif
 
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
 static inline word_t CONST wordFromVMRights(vm_rights_t vm_rights)
 {
     return (word_t)vm_rights;
@@ -236,6 +242,7 @@ static inline vm_attributes_t CONST vmAttributesFromWord(word_t w)
     attr.words[0] = w;
     return attr;
 }
+#endif
 
 #ifdef CONFIG_KERNEL_MCS
 typedef struct sched_context sched_context_t;
@@ -257,7 +264,7 @@ struct tcb {
      * 1 word*/
     notification_t *tcbBoundNotification;
 
-    /* Current fault, 2 words */
+    /* Current fault, 2 words. defined in arch/shared_types.bf */
     seL4_Fault_t tcbFault;
 
     /* Current lookup failure, 2 words */

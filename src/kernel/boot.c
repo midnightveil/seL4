@@ -12,7 +12,9 @@
 #include <model/statedata.h>
 #include <arch/machine.h>
 #include <arch/kernel/boot.h>
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
 #include <arch/kernel/vspace.h>
+#endif
 #include <linker.h>
 #include <hardware.h>
 #include <util.h>
@@ -167,7 +169,11 @@ BOOT_CODE static pptr_t alloc_rootserver_obj(word_t size_bits, word_t n)
 BOOT_CODE static word_t rootserver_max_size_bits(word_t extra_bi_size_bits)
 {
     word_t cnode_size_bits = CONFIG_ROOT_CNODE_SIZE_BITS + seL4_SlotBits;
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
     word_t max = MAX(cnode_size_bits, seL4_VSpaceBits);
+#else
+    word_t max = cnode_size_bits;
+#endif
     return MAX(max, extra_bi_size_bits);
 }
 
@@ -176,16 +182,24 @@ BOOT_CODE static word_t calculate_rootserver_size(v_region_t it_v_reg, word_t ex
     /* work out how much memory we need for root server objects */
     word_t size = BIT(CONFIG_ROOT_CNODE_SIZE_BITS + seL4_SlotBits);
     size += BIT(seL4_TCBBits); // root thread tcb
-    size += BIT(seL4_PageBits); // ipc buf
+    size += BIT(seL4_IPCBufferSizeBits); // ipc buf
     size += BIT(seL4_BootInfoFrameBits); // boot info
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
     size += BIT(seL4_ASIDPoolBits);
+#endif
     size += extra_bi_size_bits > 0 ? BIT(extra_bi_size_bits) : 0;
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
     size += BIT(seL4_VSpaceBits); // root vspace
+#endif
 #ifdef CONFIG_KERNEL_MCS
     size += BIT(seL4_MinSchedContextBits); // root sched context
 #endif
     /* for all archs, seL4_PageTable Bits is the size of all non top-level paging structures */
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
     return size + arch_get_n_paging(it_v_reg) * BIT(seL4_PageTableBits);
+#else
+    return size;
+#endif
 }
 
 BOOT_CODE static void maybe_alloc_extra_bi(word_t cmp_size_bits, word_t extra_bi_size_bits)
@@ -211,6 +225,7 @@ BOOT_CODE static void create_rootserver_objects(pptr_t start, v_region_t it_v_re
 
     maybe_alloc_extra_bi(max, extra_bi_size_bits);
 
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
     /* the root cnode is at least 4k, so it could be larger or smaller than a pd. */
 #if (CONFIG_ROOT_CNODE_SIZE_BITS + seL4_SlotBits) > seL4_VSpaceBits
     rootserver.cnode = alloc_rootserver_obj(cnode_size_bits, 1);
@@ -221,7 +236,12 @@ BOOT_CODE static void create_rootserver_objects(pptr_t start, v_region_t it_v_re
     maybe_alloc_extra_bi(cnode_size_bits, extra_bi_size_bits);
     rootserver.cnode = alloc_rootserver_obj(cnode_size_bits, 1);
 #endif
+#else
+    rootserver.cnode = alloc_rootserver_obj(cnode_size_bits, 1);
+    maybe_alloc_extra_bi(cnode_size_bits, extra_bi_size_bits);
+#endif
 
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
     /* at this point we are up to creating 4k objects - which is the min size of
      * extra_bi so this is the last chance to allocate it */
     maybe_alloc_extra_bi(seL4_PageBits, extra_bi_size_bits);
@@ -250,6 +270,11 @@ BOOT_CODE static void create_rootserver_objects(pptr_t start, v_region_t it_v_re
     rootserver.tcb = alloc_rootserver_obj(seL4_TCBBits, 1);
 #endif
 
+#else /* CONFIG_HAS_VIRTUAL_MEMORY */
+    rootserver.boot_info = alloc_rootserver_obj(seL4_BootInfoFrameBits, 1);
+    rootserver.tcb = alloc_rootserver_obj(seL4_TCBBits, 1);
+#endif
+
 #ifdef CONFIG_KERNEL_MCS
     rootserver.sc = alloc_rootserver_obj(seL4_MinSchedContextBits, 1);
 #endif
@@ -272,7 +297,11 @@ BOOT_CODE void write_slot(slot_ptr_t slot_ptr, cap_t cap)
 compile_assert(root_cnode_size_valid,
                CONFIG_ROOT_CNODE_SIZE_BITS < 32 - seL4_SlotBits &&
                BIT(CONFIG_ROOT_CNODE_SIZE_BITS) >= seL4_NumInitialCaps &&
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
                CONFIG_ROOT_CNODE_SIZE_BITS >= (seL4_PageBits - seL4_SlotBits))
+#else
+               1)
+#endif
 
 BOOT_CODE cap_t
 create_root_cnode(void)
@@ -309,9 +338,10 @@ create_domain_cap(cap_t root_cnode_cap)
     write_slot(SLOT_PTR(pptr_of_cap(root_cnode_cap), seL4_CapDomain), cap);
 }
 
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
 BOOT_CODE cap_t create_ipcbuf_frame_cap(cap_t root_cnode_cap, cap_t pd_cap, vptr_t vptr)
 {
-    clearMemory((void *)rootserver.ipc_buf, PAGE_BITS);
+    clearMemory((void *)rootserver.ipc_buf, seL4_IPCBufferSizeBits);
 
     /* create a cap of it and write it into the root CNode */
     cap_t cap = create_mapped_it_frame_cap(pd_cap, rootserver.ipc_buf, vptr, IT_ASID, false, false);
@@ -326,6 +356,7 @@ BOOT_CODE void create_bi_frame_cap(cap_t root_cnode_cap, cap_t pd_cap, vptr_t vp
     cap_t cap = create_mapped_it_frame_cap(pd_cap, rootserver.boot_info, vptr, IT_ASID, false, false);
     write_slot(SLOT_PTR(pptr_of_cap(root_cnode_cap), seL4_CapBootInfoFrame), cap);
 }
+#endif
 
 /**
  * the size_bits we return is 0 for extra_size = 0
@@ -342,7 +373,11 @@ BOOT_CODE word_t calculate_extra_bi_size_bits(word_t extra_size)
         return 0;
     }
 
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
     word_t clzl_ret = clzl(ROUND_UP(extra_size, seL4_PageBits));
+#else
+    word_t clzl_ret = clzl(extra_size);
+#endif
     word_t msb = seL4_WordBits - 1 - clzl_ret;
     /* If region is bigger than a page, make sure we overallocate rather than
      * underallocate
@@ -398,13 +433,14 @@ BOOT_CODE create_frames_of_region_ret_t create_frames_of_region(
     sword_t  pv_offset
 )
 {
-    pptr_t     f;
-    cap_t      frame_cap;
+    // pptr_t     f;
+    // cap_t      frame_cap;
     seL4_SlotPos slot_pos_before;
     seL4_SlotPos slot_pos_after;
 
     slot_pos_before = ndks_boot.slot_pos_cur;
 
+#if 0 // TODO
     for (f = reg.start; f < reg.end; f += BIT(PAGE_BITS)) {
         if (do_map) {
             frame_cap = create_mapped_it_frame_cap(pd_cap, f, pptr_to_paddr((void *)(f - pv_offset)), IT_ASID, false, true);
@@ -418,6 +454,7 @@ BOOT_CODE create_frames_of_region_ret_t create_frames_of_region(
             };
         }
     }
+#endif
 
     slot_pos_after = ndks_boot.slot_pos_cur;
 
@@ -430,6 +467,7 @@ BOOT_CODE create_frames_of_region_ret_t create_frames_of_region(
     };
 }
 
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
 BOOT_CODE cap_t create_it_asid_pool(cap_t root_cnode_cap)
 {
     cap_t ap_cap = cap_asid_pool_cap_new(ASID_HIGH(IT_ASID) << asidLowBits, rootserver.asid_pool);
@@ -443,6 +481,7 @@ BOOT_CODE cap_t create_it_asid_pool(cap_t root_cnode_cap)
 
     return ap_cap;
 }
+#endif
 
 #ifdef CONFIG_KERNEL_MCS
 BOOT_CODE static void configure_sched_context(tcb_t *tcb, sched_context_t *sc_pptr, ticks_t timeslice)
@@ -623,6 +662,7 @@ BOOT_CODE void init_core_state(tcb_t *scheduler_action)
 #endif
 }
 
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
 /**
  * Sanity check if a kernel-virtual pointer is in the kernel window that maps
  * physical memory.
@@ -638,6 +678,15 @@ BOOT_CODE static bool_t pptr_in_kernel_window(pptr_t pptr)
 {
     return pptr >= PPTR_BASE && pptr < PPTR_TOP;
 }
+#else
+
+BOOT_CODE static bool_t pptr_in_kernel_window(pptr_t pptr)
+{
+    // TODO: check paddr not cover kernel
+    return false;
+}
+
+#endif
 
 /**
  * Create an untyped cap, store it in a cnode and mark it in boot info.
@@ -794,6 +843,8 @@ BOOT_CODE bool_t create_untypeds(cap_t root_cnode_cap)
         start = ndks_boot.reserved[i].end;
     }
 
+// TODO
+#if 0
     if (start < CONFIG_PADDR_USER_DEVICE_TOP) {
         region_t reg = paddr_to_pptr_reg((p_region_t) {
             start, CONFIG_PADDR_USER_DEVICE_TOP
@@ -806,6 +857,7 @@ BOOT_CODE bool_t create_untypeds(cap_t root_cnode_cap)
             return false;
         }
     }
+#endif
 
     /* There is a part of the kernel (code/data) that is only needed for the
      * boot process. We can create UT objects for these frames, so the memory
@@ -853,6 +905,7 @@ BOOT_CODE void bi_finalise(void)
     };
 }
 
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
 BOOT_CODE static inline pptr_t ceiling_kernel_window(pptr_t p)
 {
     /* Adjust address if it exceeds the kernel window
@@ -863,6 +916,13 @@ BOOT_CODE static inline pptr_t ceiling_kernel_window(pptr_t p)
     }
     return p;
 }
+#else
+BOOT_CODE static inline pptr_t ceiling_kernel_window(pptr_t p)
+{
+    // TODO
+    return p;
+}
+#endif
 
 BOOT_CODE static bool_t check_available_memory(word_t n_available,
                                                const p_region_t *available)

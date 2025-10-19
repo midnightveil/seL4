@@ -10,6 +10,8 @@
 #include <machine/registerset.h>
 #include <hardware.h>
 
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
+
 /* When translating a physical address into an address accessible to the
  * kernel via virtual addressing we always use the mapping of the memory
  * into the physical memory window, even if the mapping originally
@@ -34,6 +36,27 @@ static inline paddr_t CONST addrFromKPPtr(const void *pptr)
     assert((paddr_t)pptr <= KERNEL_ELF_TOP);
     return (paddr_t)pptr - KERNEL_ELF_BASE_OFFSET;
 }
+
+#else /* CONFIG_HAS_VIRTUAL_MEMORY */
+
+/* Without virtual memory, these are all no-ops */
+
+static inline void *CONST ptrFromPAddr(paddr_t paddr)
+{
+    return (void *)(paddr);
+}
+
+static inline paddr_t CONST addrFromPPtr(const void *pptr)
+{
+    return (paddr_t)pptr;
+}
+
+static inline paddr_t CONST addrFromKPPtr(const void *pptr)
+{
+    return (paddr_t)pptr;
+}
+
+#endif
 
 #define paddr_to_pptr(x)   ptrFromPAddr(x)
 #define pptr_to_paddr(x)   addrFromPPtr(x)

@@ -17,6 +17,8 @@ if(KernelPlatformAst1030-evb)
 
     declare_default_headers(
         TIMER_FREQUENCY 1
+        # TODO:
+        MAX_IRQ 100
         TIMER drivers/timer/arm_systick.h
         INTERRUPT_CONTROLLER arch/machine/nvic.h
     )

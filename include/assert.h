@@ -59,7 +59,7 @@ void _assert_fail(
  * unverified_compile_assert() exists, because some compile asserts contain
  * expressions that the C parser cannot handle, too.
  */
-#ifdef CONFIG_VERIFICATION_BUILD
+#ifdef CONFIG_VERIFICATION_BUILD1
 #define compile_assert(name, expr) \
         typedef int __assert_failed_##name[(expr) ? 1 : -1] UNUSED;
 #define unverified_compile_assert(name, expr)

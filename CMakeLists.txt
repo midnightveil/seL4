@@ -233,6 +233,7 @@ string(
                # "-no-pie" is a linker option, but passing "-Wl,-no-pie" fails.
     " -Wl,--build-id=none" # Ensure reproducible builds
     " -Wl,-n" # Disable page alignment of sections
+    " -Wl,--error-limit=100000000000"
 )
 
 # Setup kernel specific flags used for both the compilation and linking step
