@@ -13,7 +13,12 @@
 void NORETURN NO_INLINE VISIBLE halt(void)
 {
     /* halt is actually, idle thread without the interrupts */
-    // MSR("daif", (DAIF_DEBUG | DAIF_SERROR | DAIF_IRQ | DAIF_FIRQ));
+
+
+    /* B5.2.1 CPS in DDI 0403E.e, p. B5-672
+       Change Processor State, sets PRIMASK=1 and FAULTMASK=1.
+    */
+    asm volatile("cpsid if");
 
 #ifdef CONFIG_PRINTING
     printf("halting...");
