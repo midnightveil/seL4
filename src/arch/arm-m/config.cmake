@@ -36,7 +36,8 @@ add_sources(
         object/objecttype.c
         object/interrupt.c
         object/tcb.c
-    ASMFILES head.S
+
+    ASMFILES head.S idle.S
 )
 
 add_bf_source_old("KernelArchARM-M" "structures.bf" "include/arch/arm-m" "arch/object")
