@@ -146,6 +146,12 @@ int PURE strncmp(const char *s1, const char *s2, int n);
 long CONST char_to_long(char c);
 long PURE str_to_long(const char *str);
 
+/* arm-none-eabi can generate calls to __aeabi_memclr4
+   https://github.com/ARM-software/abi-aa/blob/2982a9f3b512a5bfdc9e3fea5d3b298f9165c36b/rtabi32/rtabi32.rst#534memory-copying-clearing-and-setting
+   HACK: word_t as size_t
+*/
+void __aeabi_memclr4(void *dest, word_t n) VISIBLE;
+
 /* Library functions for counting leading/trailing zeros.
  *
  * GCC/LLVM provides builtin function like __builtin_clzl() for this, which

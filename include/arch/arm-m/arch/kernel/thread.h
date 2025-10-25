@@ -9,7 +9,9 @@
 /* TODO: ??? best spot, was in vspace.h */
 word_t *PURE lookupIPCBuffer(bool_t isReceiver, tcb_t *thread);
 exception_t checkValidIPCBuffer(vptr_t vptr, cap_t cap);
-
+#ifdef CONFIG_PRINTING
+void Arch_userStackTrace(tcb_t *tptr);
+#endif
 
 
 /* XXX: directly arm thread.h **/

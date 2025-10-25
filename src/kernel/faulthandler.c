@@ -114,12 +114,14 @@ static void print_fault(seL4_Fault_t f)
                seL4_Fault_CapFault_get_inReceivePhase(f) ? "receive" : "send",
                (void *)seL4_Fault_CapFault_get_address(f));
         break;
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
     case seL4_Fault_VMFault:
         printf("vm fault on %s at address %p with status %p",
                seL4_Fault_VMFault_get_instructionFault(f) ? "code" : "data",
                (void *)seL4_Fault_VMFault_get_address(f),
                (void *)seL4_Fault_VMFault_get_FSR(f));
         break;
+#endif
     case seL4_Fault_UnknownSyscall:
         printf("unknown syscall %p",
                (void *)seL4_Fault_UnknownSyscall_get_syscallNumber(f));

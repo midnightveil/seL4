@@ -12,8 +12,8 @@ if(KernelPlatformAst1030-evb)
     set(KernelArmCortexM4F ON)
     set(KernelArchArmV7em ON)
 
-    list(APPEND KernelDTSList "tools/dts/${KernelPlatform}.dts")
-    list(APPEND KernelDTSList "src/plat/ast1030-evb/overlay-${KernelPlatform}.dts")
+    list(APPEND KernelDTSList "tools/dts/ast1030-evb.dts")
+    list(APPEND KernelDTSList "src/plat/ast1030-evb/overlay-ast1030-evb.dts")
 
     declare_default_headers(
         TIMER_FREQUENCY 1

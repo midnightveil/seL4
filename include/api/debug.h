@@ -11,9 +11,12 @@
 
 #include <benchmark/benchmark_track.h>
 #include <arch/api/syscall.h>
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
 #include <arch/kernel/vspace.h>
+#endif
 #include <model/statedata.h>
 #include <kernel/thread.h>
+#include <arch/kernel/thread.h>
 
 #ifdef CONFIG_PRINTING
 
@@ -70,7 +73,7 @@ static inline void debug_printUserState(void)
 {
     tcb_t *tptr = NODE_STATE(ksCurThread);
     printf("Current thread: %s\n", TCB_PTR_DEBUG_PTR(tptr)->tcbName);
-    printf("Next instruction address: %lx\n", getRestartPC(tptr));
+    printf("Next instruction address: %"SEL4_PRIx_word"\n", getRestartPC(tptr));
     printf("Stack:\n");
     Arch_userStackTrace(tptr);
 }

@@ -262,7 +262,7 @@ static char *fmt_o(uintmax_t x, char *s)
 static char *fmt_u(uintmax_t x, char *s)
 {
     while (0 != x) {
-#if defined(CONFIG_ARCH_AARCH32) || defined(CONFIG_ARCH_RISCV32) || defined(CONFIG_ARCH_IA32)
+#if defined(CONFIG_ARCH_AARCH32) || defined(CONFIG_ARCH_RISCV32) || defined(CONFIG_ARCH_IA32) || defined(CONFIG_ARCH_ARM_M)
         /* On 32-bit systems, dividing a 64-bit number by 10 makes the compiler
          * call a helper function from a compiler runtime library. The actual
          * function differs, currently for x86 it's __udivdi3(), for ARM its

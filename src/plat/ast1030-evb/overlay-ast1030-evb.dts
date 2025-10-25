@@ -1,4 +1,11 @@
 / {
+	chosen {
+		seL4,kernel-devices =
+			&uart5,
+			&nvic,
+			&systick;
+	};
+
 	memory@0 {
 		device_type = "memory";
 	};

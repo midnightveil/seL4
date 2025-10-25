@@ -85,12 +85,6 @@
 / {
     model = "Aspeed AST1030 Evaluation board";
     compatible = "aspeed,ast1030-evb";
-
-    chosen {
-        zephyr,console = &uart5;
-        zephyr,shell-uart = &uart5;
-        zephyr,sram = &sram0;
-    };
 };
 
 &sram0 {

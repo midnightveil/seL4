@@ -236,12 +236,14 @@ void obj_tcb_print_slots(tcb_t *tcb)
         cap_cnode_print_attrs(TCB_PTR_CTE_PTR(tcb, tcbCTable)->cap);
     }
 
+#ifdef CONFIH_HAS_VIRTUAL_MEMORY
     /* VSpace root */
     if (cap_get_capType(TCB_PTR_CTE_PTR(tcb, tcbVTable)->cap) != cap_null_cap) {
         printf("vspace: %p_pd\n",
                cap_vtable_cap_get_vspace_root_fp(TCB_PTR_CTE_PTR(tcb, tcbVTable)->cap));
 
     }
+#endif
 
     /* IPC buffer cap slot */
     if (cap_get_capType(TCB_PTR_CTE_PTR(tcb, tcbBuffer)->cap) != cap_null_cap) {

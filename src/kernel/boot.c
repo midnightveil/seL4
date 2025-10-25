@@ -27,11 +27,12 @@ BOOT_BSS static region_t rootserver_mem;
 
 /* Returns the physical region of the kernel image boot part, which is the part
  * that is no longer needed once booting is finished. */
+extern char ki_boot_start[1];
 extern char ki_boot_end[1];
 BOOT_CODE p_region_t get_p_reg_kernel_img_boot(void)
 {
     return (p_region_t) {
-        .start = kpptr_to_paddr((const void *)KERNEL_ELF_BASE),
+        .start = kpptr_to_paddr(ki_boot_start),
         .end   = kpptr_to_paddr(ki_boot_end)
     };
 }
@@ -893,11 +894,12 @@ BOOT_CODE bool_t create_untypeds(cap_t root_cnode_cap)
 
 BOOT_CODE void bi_finalise(void)
 {
-
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
     if (rootserver.paging.start != rootserver.paging.end) {
         printf("WARNING: internal book keeping error. Less pagetables allocated than predicted: "
                "%ld page tables allocated but not used.\n", (rootserver.paging.end - rootserver.paging.start) >> seL4_PageTableBits);
     }
+#endif
 
     ndks_boot.bi_frame->empty = (seL4_SlotRegion) {
         .start = ndks_boot.slot_pos_cur,

@@ -137,6 +137,10 @@ long PURE str_to_long(const char *str)
     return val;
 }
 
+void __aeabi_memclr4(void *dest, word_t n) {
+    memzero(dest, n);
+}
+
 // The following implementations of CLZ (count leading zeros) and CTZ (count
 // trailing zeros) perform a binary search for the first 1 bit from the
 // beginning (resp. end) of the input. Initially, the focus is the whole input.

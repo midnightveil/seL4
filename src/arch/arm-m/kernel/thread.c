@@ -10,3 +10,9 @@ void Arch_postModifyRegisters(tcb_t *tptr)
 {
     /* Nothing to do */
 }
+
+void Arch_userStackTrace(tcb_t *tptr)
+{
+    printf("user stack trace\n");
+    assert(!"TODO");
+}

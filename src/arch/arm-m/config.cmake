@@ -8,8 +8,11 @@ cmake_minimum_required(VERSION 3.16.0)
 
 config_set(KernelHasVirtualMemory HAS_VIRTUAL_MEMORY OFF)
 
+# Size!
+set(KernelOptimisation "-Os" CACHE STRING "")
+
 set(KernelFastpath OFF CACHE BOOL "")
-set(KernelMaxNumBootinfoUntypedCaps 50 CACHE BOOL "")
+set(KernelMaxNumBootinfoUntypedCaps 50 CACHE STRING "")
 
 add_sources(
     DEP "KernelArchARM-M"
@@ -23,13 +26,13 @@ add_sources(
         halt.c
         # c_traps.c
         # benchmark/benchmark.c
-        # kernel/boot.c
+        kernel/boot.c
         kernel/thread.c
         # machine/cache.c
         # machine/errata.c
         # machine/debug.c
         # machine/hardware.c
-        # machine/io.c
+        machine/io.c
         object/objecttype.c
         object/interrupt.c
         object/tcb.c

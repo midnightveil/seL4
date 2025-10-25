@@ -114,6 +114,7 @@ exception_t handleUnknownSyscall(word_t w)
         printf("Debug halt syscall from user thread %p \"%s\"\n", tptr, TCB_PTR_DEBUG_PTR(tptr)->tcbName);
         halt();
     }
+#if 0 // TODO
     if (w == SysDebugSnapshot) {
         tcb_t *UNUSED tptr = NODE_STATE(ksCurThread);
         printf("Debug snapshot syscall from user thread %p \"%s\"\n",
@@ -121,6 +122,7 @@ exception_t handleUnknownSyscall(word_t w)
         debug_capDL();
         return EXCEPTION_NONE;
     }
+#endif
     if (w == SysDebugCapIdentify) {
         word_t cptr = getRegister(NODE_STATE(ksCurThread), capRegister);
         lookupCapAndSlot_ret_t lu_ret = lookupCapAndSlot(NODE_STATE(ksCurThread), cptr);

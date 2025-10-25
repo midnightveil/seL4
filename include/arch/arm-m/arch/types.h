@@ -3,8 +3,8 @@
 #include <config.h>
 #include <stdint.h>
 
-typedef uint32_t word_t;
-typedef int32_t sword_t;
+typedef unsigned long word_t;
+typedef signed long sword_t;
 /* for printf() formatting */
 #define _seL4_word_fmt  l
 
@@ -16,10 +16,9 @@ typedef word_t node_id_t;
 typedef word_t cpu_id_t;
 typedef word_t dom_t;
 
-/* TODO: Is this needed? */
 typedef struct kernel_frame {
     paddr_t paddr;
-    pptr_t pptr;
+    word_t size;
     int armExecuteNever;
     int userAvailable;
 } kernel_frame_t;
