@@ -28,17 +28,17 @@ static inline void debug_printKernelEntryReason(void)
         printf("Interrupt, irq %lu\n", (unsigned long) ksKernelEntry.word);
         break;
     case Entry_UnknownSyscall:
-        printf("Unknown syscall, word: %lu", (unsigned long) ksKernelEntry.word);
+        printf("Unknown syscall, word: %lu\n", (unsigned long) ksKernelEntry.word);
         break;
     case Entry_VMFault:
         printf("VM Fault, fault type: %lu\n", (unsigned long) ksKernelEntry.word);
         break;
     case Entry_UserLevelFault:
-        printf("User level fault, number: %lu", (unsigned long) ksKernelEntry.word);
+        printf("User level fault, number: %lu\n", (unsigned long) ksKernelEntry.word);
         break;
 #ifdef CONFIG_HARDWARE_DEBUG_API
     case Entry_DebugFault:
-        printf("Debug fault. Fault Vaddr: 0x%lx", (unsigned long) ksKernelEntry.word);
+        printf("Debug fault. Fault Vaddr: 0x%lx\n", (unsigned long) ksKernelEntry.word);
         break;
 #endif
     case Entry_Syscall:

@@ -102,7 +102,7 @@ char ksIdleThreadSC[CONFIG_MAX_NUM_NODES][BIT(seL4_MinSchedContextBits)] ALIGN(B
 #endif
 
 #if (defined CONFIG_DEBUG_BUILD || defined CONFIG_BENCHMARK_TRACK_KERNEL_ENTRIES)
-kernel_entry_t ksKernelEntry;
+kernel_entry_t ksKernelEntry = { .path = Entry_Unknown };
 #endif /* DEBUG */
 
 #ifdef CONFIG_KERNEL_LOG_BUFFER
