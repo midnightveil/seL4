@@ -52,9 +52,7 @@ devices:
       INTERRUPT_VGIC_MAINTENANCE: 0
   # ARM NVIC (interrupt-controller/arm,nvic.yaml)
   - compatible:
-      - arm,v6m-nvic
       - arm,v7m-nvic
-      - arm,v8m-nvic
     regions:
       - index: 0
         kernel: NVIC_PADDR
@@ -210,6 +208,7 @@ devices:
       - xlnx,xuartps
       - ns16550a
       - ns16550
+      - arm,cmsdk-uart
     regions:
       - index: 0
         kernel: UART_PPTR

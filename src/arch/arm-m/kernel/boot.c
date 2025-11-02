@@ -70,6 +70,9 @@ BOOT_CODE static bool_t init_cpu(void)
 
 void init_kernel(void)
 {
+    void uart_init(void);
+    uart_init();
+
     printf("Bootstrapping kernel\n");
 
     /* initialise the CPU */
@@ -78,5 +81,6 @@ void init_kernel(void)
         halt();
     }
 
+    halt();
     while (1);
 }

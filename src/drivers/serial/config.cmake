@@ -49,3 +49,8 @@ register_driver(
     PREFIX src/drivers/serial
     CFILES "ns16550.c"
 )
+register_driver(
+    compatibility_strings "arm,cmsdk-uart"
+    PREFIX src/drivers/serial
+    CFILES "cmsdk-uart.c"
+)

@@ -65,14 +65,20 @@ static inline CONST word_t physBase(void)
 {% endif %}
 {% endfor -%}
 
-// {0: {'index': 0, 'kernel': 'UART_PPTR', 'macro': 'CONFIG_PRINTING', 'user': True, 'kernel_size': 4096}} [Region(base=0x7e784000,size=0x1000)]
+// {0: {'index': 0, 'kernel': 'UART_PPTR', 'macro': 'CONFIG_PRINTING', 'user': True, 'kernel_size': 4096}} [Region(base=0x40004000,size=0x1000)]
 // {0: {'index': 0, 'kernel': 'NVIC_PADDR'}} [Region(base=0xe000e100,size=0xc00)]
 // {0: {'index': 0, 'kernel': 'SYSTICK_PADDR'}} [Region(base=0xe000e010,size=0x10)]
 
+// TODO: this should not be hardcoded
 #ifdef CONFIG_PRINTING
-#define UART_PADDR 0x7e784000
+#if defined(CONFIG_PLAT_AST1030_EVB)
+    #define UART_PADDR 0x7e784000
+#elif defined(CONFIG_PLAT_MPS2_AN386)
+    #define UART_PADDR 0x40004000
+#endif
 #endif
 
+// but this can be
 #define NVIC_PADDR 0xe000e100
 #define SYSTICK_PADDR 0xe000e010
 
