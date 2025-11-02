@@ -1,9 +1,12 @@
+#include <arch/kernel/boot.h>
+#include <kernel/boot.h>
+#include <kernel/thread.h>
 #include <linker.h>
+#include <machine.h>
 #include <machine/io.h>
 #include <machine/fpu.h>
+#include <object/objecttype.h>
 #include <util.h>
-
-void init_kernel(void) NORETURN;
 
 /** This and only this function initialises the CPU.
  *
@@ -68,7 +71,48 @@ BOOT_CODE static bool_t init_cpu(void)
     return true;
 }
 
-void init_kernel(void)
+BOOT_CODE static void init_irqs(cap_t root_cnode_cap)
+{
+#if 0
+    unsigned i;
+
+    for (i = 0; i <= maxIRQ ; i++) {
+        setIRQState(IRQInactive, CORE_IRQ_TO_IRQT(0, i));
+    }
+
+    setIRQState(IRQTimer, CORE_IRQ_TO_IRQT(0, KERNEL_TIMER_IRQ));
+#endif
+
+    /* provide the IRQ control cap */
+    write_slot(SLOT_PTR(pptr_of_cap(root_cnode_cap), seL4_CapIRQControl), cap_irq_control_cap_new());
+}
+
+BOOT_BSS static region_t res_reg[NUM_RESERVED_REGIONS];
+
+BOOT_CODE static bool_t arch_init_freemem(void)
+{
+    /* Reserve the kernel image region. This may look a bit awkward, as the
+     * symbols are a reference in the kernel image window, but all allocations
+     * are done in terms of the main kernel window, so we do some translation.
+     */
+    res_reg[0] = paddr_to_pptr_reg(get_p_reg_kernel_img());
+    int index = 1;
+
+    // /* reserve the user image region */
+    // if (index >= ARRAY_SIZE(res_reg)) {
+    //     printf("ERROR: no slot to add user image to reserved regions\n");
+    //     return false;
+    // }
+    // res_reg[index] = ui_reg;
+    // index += 1;
+
+    /* avail_p_regs comes from the auto-generated code */
+    return init_freemem(ARRAY_SIZE(avail_p_regs), avail_p_regs,
+                        index, res_reg,
+                        (v_region_t){0}, 0);
+}
+
+BOOT_CODE static bool_t try_init_kernel(void)
 {
     void uart_init(void);
     uart_init();
@@ -78,9 +122,78 @@ void init_kernel(void)
     /* initialise the CPU */
     if (!init_cpu()) {
         printf("ERROR: CPU init failed\n");
-        halt();
+        return false;
     }
 
-    halt();
-    while (1);
+    if (!arch_init_freemem()) {
+        printf("ERROR: free memory management initialization failed\n");
+        return false;
+    }
+
+    /* create the root cnode */
+    cap_t root_cnode_cap = create_root_cnode();
+    if (cap_get_capType(root_cnode_cap) == cap_null_cap) {
+        printf("ERROR: root c-node creation failed\n");
+        return false;
+    }
+
+    /* create the cap for managing thread domains */
+    create_domain_cap(root_cnode_cap);
+
+    /* initialise the IRQ states and provide the IRQ control cap */
+    init_irqs(root_cnode_cap);
+
+#ifdef CONFIG_KERNEL_MCS
+    init_sched_control(root_cnode_cap, CONFIG_MAX_NUM_NODES);
+
+    NODE_STATE(ksCurTime) = getCurrentTime();
+#endif
+
+    /* create the idle thread */
+    create_idle_thread();
+
+    tcb_t *initial = create_initial_thread(
+                         root_cnode_cap,
+                         // it_pd_cap,
+                         /* ui_entry */ 0x80000000
+                         // bi_frame_vptr,
+                         // ipcbuf_vptr,
+                         // ipcbuf_cap
+                     );
+
+    if (initial == NULL) {
+        printf("ERROR: could not create initial thread\n");
+        return false;
+    }
+
+    init_core_state(initial);
+
+    /* create all of the untypeds. Both devices and kernel window memory */
+    if (!create_untypeds(root_cnode_cap)) {
+        printf("ERROR: could not create untypeds for kernel image boot memory\n");
+        return false;
+    }
+
+    printf("Booting all finished, dropped to user space\n");
+    return true;
+}
+
+
+BOOT_CODE VISIBLE void init_kernel(void)
+{
+    bool_t result;
+
+    result = try_init_kernel();
+
+    if (!result) {
+        fail("ERROR: kernel init failed");
+    }
+
+#ifdef CONFIG_KERNEL_MCS
+    NODE_STATE(ksCurTime) = getCurrentTime();
+    NODE_STATE(ksConsumed) = 0;
+#endif
+
+    schedule();
+    activateThread();
 }

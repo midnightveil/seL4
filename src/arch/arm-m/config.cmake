@@ -24,7 +24,7 @@ add_sources(
         machine/thread.c
         api/faults.c
         halt.c
-        # c_traps.c
+        c_traps.c
         # benchmark/benchmark.c
         kernel/boot.c
         kernel/thread.c
@@ -37,7 +37,7 @@ add_sources(
         object/interrupt.c
         object/tcb.c
 
-    ASMFILES head.S idle.S
+    ASMFILES head.S idle.S traps.S
 )
 
 add_bf_source_old("KernelArchARM-M" "structures.bf" "include/arch/arm-m" "arch/object")

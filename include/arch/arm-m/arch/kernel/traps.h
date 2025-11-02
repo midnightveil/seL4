@@ -24,25 +24,10 @@ static inline void arch_c_exit_hook(void)
     // arm_load_thread_id(NODE_STATE(ksCurThread));
 }
 
-void VISIBLE NORETURN restore_user_context(void);
 
+/*
 void c_handle_syscall(word_t cptr, word_t msgInfo, syscall_t syscall)
 VISIBLE SECTION(".vectors.text");
-
-#ifdef CONFIG_FASTPATH
-void c_handle_fastpath_call(word_t cptr, word_t msgInfo)
-VISIBLE SECTION(".vectors.text");
-
-void c_handle_fastpath_signal(word_t cptr, word_t msgInfo)
-VISIBLE SECTION(".vectors.text");
-
-#ifdef CONFIG_KERNEL_MCS
-void c_handle_fastpath_reply_recv(word_t cptr, word_t msgInfo, word_t reply)
-#else
-void c_handle_fastpath_reply_recv(word_t cptr, word_t msgInfo)
-#endif
-VISIBLE SECTION(".vectors.text");
-#endif
 
 void c_handle_interrupt(void)
 VISIBLE SECTION(".vectors.text");
@@ -55,3 +40,7 @@ VISIBLE SECTION(".vectors.text");
 
 void c_handle_instruction_fault(void)
 VISIBLE SECTION(".vectors.text");
+*/
+
+void restore_user_context(void)
+VISIBLE NORETURN SECTION(".text.trips");

@@ -90,11 +90,15 @@ create_it_pd_pts(
 tcb_t *
 create_initial_thread(
     cap_t  root_cnode_cap,
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
     cap_t  it_pd_cap,
     vptr_t ui_v_entry,
     vptr_t bi_frame_vptr,
     vptr_t ipcbuf_vptr,
     cap_t  ipcbuf_cap
+#else
+    vptr_t ui_entry
+#endif
 );
 
 void init_core_state(tcb_t *scheduler_action);

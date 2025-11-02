@@ -3,14 +3,14 @@
 set -euo pipefail
 
 # qemu-system-arm -M ast1030-evb -nographic -kernel "$@"
-# qemu-system-arm -M mps2-an386 -nographic -kernel "$@"
+qemu-system-arm -M mps2-an386 -nographic -kernel "$@"
 
 # use --list-params
-~/ARM/avh-linux-x86/bin/FVP_MPS2_Cortex-M4 \
-    -C armcortexm4ct.semihosting-enable=0 \
-    -C fvp_mps2.UART0.out_file='-' \
-    -q \
-    -a "$@"
+# ~/ARM/avh-linux-x86/bin/FVP_MPS2_Cortex-M4 \
+#     -C armcortexm4ct.semihosting-enable=0 \
+#     -C fvp_mps2.UART0.out_file='-' \
+#     -q \
+#     -a "$@"
 
 
 # Fast Models Fixed Virtual Platforms in Arm Development

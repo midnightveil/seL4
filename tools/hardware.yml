@@ -158,6 +158,8 @@ devices:
     regions:
       - index: 0
         kernel: SYSTICK_PADDR
+    interrupts:
+      KERNEL_TIMER_IRQ: 0
   # QCOM Krait timer (timer/qcom,msm-timer.txt)
   - compatible:
       - qcom,kpss-timer

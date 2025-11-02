@@ -105,11 +105,6 @@ extern const register_t gpRegisters[];
 
 static inline void Arch_initContext(user_context_t *context)
 {
+    // TODO
     // context->registers[CPSR] = CPSR_USER;
-#ifdef CONFIG_HAVE_FPU
-    context->fpuState.fpexc = BIT(FPEXC_EN_BIT);
-#endif
-#ifdef ARM_BASE_CP14_SAVE_AND_RESTORE
-    Arch_initBreakpointContext(context);
-#endif
 }

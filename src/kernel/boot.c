@@ -183,7 +183,7 @@ BOOT_CODE static word_t calculate_rootserver_size(v_region_t it_v_reg, word_t ex
     /* work out how much memory we need for root server objects */
     word_t size = BIT(CONFIG_ROOT_CNODE_SIZE_BITS + seL4_SlotBits);
     size += BIT(seL4_TCBBits); // root thread tcb
-    size += BIT(seL4_IPCBufferSizeBits); // ipc buf
+    // size += BIT(seL4_IPCBufferSizeBits); // ipc buf
     size += BIT(seL4_BootInfoFrameBits); // boot info
 #ifdef CONFIG_HAS_VIRTUAL_MEMORY
     size += BIT(seL4_ASIDPoolBits);
@@ -539,8 +539,12 @@ BOOT_CODE void create_idle_thread(void)
 #endif /* ENABLE_SMP_SUPPORT */
 }
 
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
 BOOT_CODE tcb_t *create_initial_thread(cap_t root_cnode_cap, cap_t it_pd_cap, vptr_t ui_v_entry, vptr_t bi_frame_vptr,
                                        vptr_t ipcbuf_vptr, cap_t ipcbuf_cap)
+#else
+BOOT_CODE tcb_t *create_initial_thread(cap_t root_cnode_cap, vptr_t ui_v_entry)
+#endif
 {
     tcb_t *tcb = TCB_PTR(rootserver.tcb + TCB_OFFSET);
 #ifndef CONFIG_KERNEL_MCS
@@ -549,12 +553,14 @@ BOOT_CODE tcb_t *create_initial_thread(cap_t root_cnode_cap, cap_t it_pd_cap, vp
 
     Arch_initContext(&tcb->tcbArch.tcbContext);
 
+#if 0
     /* derive a copy of the IPC buffer cap for inserting */
     deriveCap_ret_t dc_ret = deriveCap(SLOT_PTR(pptr_of_cap(root_cnode_cap), seL4_CapInitThreadIPCBuffer), ipcbuf_cap);
     if (dc_ret.status != EXCEPTION_NONE) {
         printf("Failed to derive copy of IPC Buffer\n");
         return NULL;
     }
+#endif
 
     /* initialise TCB (corresponds directly to abstract specification) */
     cteInsert(
@@ -562,6 +568,7 @@ BOOT_CODE tcb_t *create_initial_thread(cap_t root_cnode_cap, cap_t it_pd_cap, vp
         SLOT_PTR(pptr_of_cap(root_cnode_cap), seL4_CapInitThreadCNode),
         SLOT_PTR(rootserver.tcb, tcbCTable)
     );
+#if 0
     cteInsert(
         it_pd_cap,
         SLOT_PTR(pptr_of_cap(root_cnode_cap), seL4_CapInitThreadVSpace),
@@ -575,6 +582,7 @@ BOOT_CODE tcb_t *create_initial_thread(cap_t root_cnode_cap, cap_t it_pd_cap, vp
     tcb->tcbIPCBuffer = ipcbuf_vptr;
 
     setRegister(tcb, capRegister, bi_frame_vptr);
+#endif
     setNextPC(tcb, ui_v_entry);
 
     /* initialise TCB */
@@ -679,12 +687,13 @@ BOOT_CODE static bool_t pptr_in_kernel_window(pptr_t pptr)
 {
     return pptr >= PPTR_BASE && pptr < PPTR_TOP;
 }
+
 #else
 
 BOOT_CODE static bool_t pptr_in_kernel_window(pptr_t pptr)
 {
-    // TODO: check paddr not cover kernel
-    return false;
+    /* as there is no virtual memory, all of physical memory is */
+    return true;
 }
 
 #endif
@@ -860,6 +869,8 @@ BOOT_CODE bool_t create_untypeds(cap_t root_cnode_cap)
     }
 #endif
 
+    printf("hello\n");
+
     /* There is a part of the kernel (code/data) that is only needed for the
      * boot process. We can create UT objects for these frames, so the memory
      * can be reused.
@@ -871,6 +882,7 @@ BOOT_CODE bool_t create_untypeds(cap_t root_cnode_cap)
                boot_mem_reuse_reg.start, boot_mem_reuse_reg.end);
         return false;
     }
+    printf("hello2\n");
 
     /* convert remaining freemem into UT objects and provide the caps */
     for (word_t i = 0; i < ARRAY_SIZE(ndks_boot.freemem); i++) {
@@ -883,11 +895,13 @@ BOOT_CODE bool_t create_untypeds(cap_t root_cnode_cap)
             return false;
         }
     }
+    printf("hello3\n");
 
     ndks_boot.bi_frame->untyped = (seL4_SlotRegion) {
         .start = first_untyped_slot,
         .end   = ndks_boot.slot_pos_cur
     };
+    printf("hello4\n");
 
     return true;
 }
