@@ -12,7 +12,6 @@ static inline void clearMemory(word_t *ptr, word_t bits)
 word_t PURE getRestartPC(tcb_t *thread);
 void setNextPC(tcb_t *thread, word_t v);
 
-#if 0
 /**
  * Move to Register from Special Register
  * B3.2.2 of ARMv7-M ARM DDI 0403E.e.
@@ -32,4 +31,3 @@ void setNextPC(tcb_t *thread, word_t v);
     asm volatile("msr " spec_reg ", %0" :: "r"(_v) ); \
     _v; \
 })
-#endif

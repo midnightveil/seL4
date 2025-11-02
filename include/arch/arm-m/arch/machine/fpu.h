@@ -12,6 +12,9 @@
 /* "Fields CP10 and CP11 together control access to the Floating-point coprocessor, if implemented" */
 #define CPACR_CP_FPU_MASK (CPACR_CPn_MASK(10) | CPACR_CPn_MASK(11))
 
+/* Check for the presence of the optional floating point extensions FPv4-SP
+   and FPv5. Reference A2.5 and B3.2.20 of ARMv7-M ARM DDI 0403E.e.
+*/
 BOOT_CODE static inline bool_t fp_HWCapTest(void)
 {
 

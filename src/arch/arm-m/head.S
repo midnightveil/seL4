@@ -10,7 +10,10 @@
 /* https://community.arm.com/arm-community-blogs/b/architectures-and-processors-blog/posts/writing-your-own-startup-code-for-cortex-m */
 
 .syntax unified
+.thumb
+
 .section .boot.text, "ax"
+.thumb_func
 BEGIN_FUNC(_start)
     b init_kernel
 END_FUNC(_start)

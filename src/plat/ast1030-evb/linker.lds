@@ -23,8 +23,8 @@ SECTIONS
         *(.bss)
     }
 
-    /* Main Stack Pointer, 4-byte aligned */
-    .MSP : ALIGN(4) {
+    /* Main Stack Pointer (MSP), 4-byte aligned */
+    .SP_main : ALIGN(4) {
         __stack_start = .;
         . = . + 2048;
         __stack_end = .;
