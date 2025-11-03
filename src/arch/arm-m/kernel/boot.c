@@ -143,6 +143,8 @@ BOOT_CODE static bool_t try_init_kernel(void)
     /* initialise the IRQ states and provide the IRQ control cap */
     init_irqs(root_cnode_cap);
 
+    populate_bi_frame(0, CONFIG_MAX_NUM_NODES, /* ipcbuf_vptr */ 0x0, 0x0);
+
 #ifdef CONFIG_KERNEL_MCS
     init_sched_control(root_cnode_cap, CONFIG_MAX_NUM_NODES);
 
