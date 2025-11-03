@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: GPL-2.0-only
  */
 
+#include <arch/kernel/traps.h>
+#include <arch/machine.h>
 #include <arch/machine/registerset.h>
 #include <arch/types.h>
-#include <arch/kernel/traps.h>
 #include <config.h>
 #include <model/statedata.h>
 #include <util.h>

@@ -801,6 +801,8 @@ BOOT_CODE static bool_t create_untypeds_for_region(
        the kernel window. This is not checked here. */
     while (!is_reg_empty(reg)) {
 
+        assert(reg.start <= reg.end);
+
         /* Calculate the bit size of the region. This is also correct for end < start: it will
            return the correct size of the set [start..-1] union [0..end). This will then be too
            large for alignment, so the code further down will reduce the size. */
@@ -853,8 +855,6 @@ BOOT_CODE bool_t create_untypeds(cap_t root_cnode_cap)
         start = ndks_boot.reserved[i].end;
     }
 
-// TODO
-#if 0
     if (start < CONFIG_PADDR_USER_DEVICE_TOP) {
         region_t reg = paddr_to_pptr_reg((p_region_t) {
             start, CONFIG_PADDR_USER_DEVICE_TOP
@@ -867,9 +867,9 @@ BOOT_CODE bool_t create_untypeds(cap_t root_cnode_cap)
             return false;
         }
     }
-#endif
 
-    printf("hello\n");
+#if 0
+    printf("boot types\n");
 
     /* There is a part of the kernel (code/data) that is only needed for the
      * boot process. We can create UT objects for these frames, so the memory
@@ -882,7 +882,7 @@ BOOT_CODE bool_t create_untypeds(cap_t root_cnode_cap)
                boot_mem_reuse_reg.start, boot_mem_reuse_reg.end);
         return false;
     }
-    printf("hello2\n");
+#endif
 
     /* convert remaining freemem into UT objects and provide the caps */
     for (word_t i = 0; i < ARRAY_SIZE(ndks_boot.freemem); i++) {
@@ -895,13 +895,11 @@ BOOT_CODE bool_t create_untypeds(cap_t root_cnode_cap)
             return false;
         }
     }
-    printf("hello3\n");
 
     ndks_boot.bi_frame->untyped = (seL4_SlotRegion) {
         .start = first_untyped_slot,
         .end   = ndks_boot.slot_pos_cur
     };
-    printf("hello4\n");
 
     return true;
 }

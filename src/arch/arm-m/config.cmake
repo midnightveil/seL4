@@ -8,6 +8,11 @@ cmake_minimum_required(VERSION 3.16.0)
 
 config_set(KernelHasVirtualMemory HAS_VIRTUAL_MEMORY OFF)
 
+# TODO: should be this but this appears to... because we use the [start, end)
+#       rather than [start, end] in the boot code this breaks
+# math(EXPR KernelPaddrUserTop "(1 << 32) - 1")
+math(EXPR KernelPaddrUserTop "(1 << 31)")
+
 # Size!
 set(KernelOptimisation "-Os" CACHE STRING "")
 
@@ -37,7 +42,7 @@ add_sources(
         object/interrupt.c
         object/tcb.c
 
-    ASMFILES head.S idle.S traps.S
+    ASMFILES idle.S traps.S
 )
 
 add_bf_source_old("KernelArchARM-M" "structures.bf" "include/arch/arm-m" "arch/object")

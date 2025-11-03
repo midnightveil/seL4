@@ -4,13 +4,13 @@
 #include <hardware.h>
 #include <arch/machine/hardware.h>
 
-
-ENTRY(_start)
-
 SECTIONS
 {
     . = KERNEL_ELF_BASE;
 
+    /* TODO: make this at an arbitrary address as
+            On reset, the processor initializes the vector table base address to an IMPLEMENTATION DEFINED address
+     */
     .isr_vector : {
         *(isr_vector)
     }
@@ -23,19 +23,13 @@ SECTIONS
         *(.bss)
     }
 
-    /* Main Stack Pointer (MSP), 4-byte aligned */
-    .SP_main : ALIGN(4) {
-        __stack_start = .;
-        . = . + 2048;
-        __stack_end = .;
-    }
-
     .rodata : {
         *(.rodata)
         *(.rodata.*)
     }
 
     .text : {
+        _start = .; /* make LLVM happy */
         *(.text)
     }
 
