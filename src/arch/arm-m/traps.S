@@ -29,7 +29,8 @@
  * TODO
  **/
 .align 7 /* 2^7 */
-BEGIN_FUNC(arm_vector_table)
+.global arm_vector_table
+arm_vector_table:
     /*  1 */ .word (kernel_stack_alloc + BIT(CONFIG_KERNEL_STACK_BITS))
     /*  2 */ .word arm_Reset_exception
     /*  3 */ .word arm_NMI_exception
@@ -49,7 +50,7 @@ BEGIN_FUNC(arm_vector_table)
     .word 0 /* External interrupt 0 */
     /* etc etc */
     /* TODO: pad to # interrupts */
-END_FUNC(arm_vector_table)
+.size arm_vector_table, .-arm_vector_table
 
 .section .boot.text, "ax"
 BEGIN_FUNC(arm_Reset_exception)
@@ -65,6 +66,14 @@ BEGIN_FUNC(arm_Reset_exception)
      */
     b restore_user_context
 END_FUNC(arm_Reset_exception)
+
+/**
+ * Each of the following exceptions behave following the ExceptionEntry()
+ * psuedocode in §B1.5.6 ARMv7-M ARM DDI 0403E.e.
+ *
+ * We have disabled the FPU, so framesize = 0x20 and forcealign = CCR.STKALIGN,
+ * which we set to 1, so the pushed stack frame is aligned.
+ **/
 
 .section .text.vectors, "ax"
 BEGIN_FUNC(arm_NMI_exception)
@@ -95,6 +104,11 @@ BEGIN_FUNC(arm_DebugMonitor_exception)
     b halt
 END_FUNC(arm_DebugMonitor_exception)
 
+/**
+ * We use the PendSV exception to handle context switching, as per the ARM
+ * recommendations in "Use of SVCall and PendSV to avoid critical code regions"
+ * on B1-530 of ARMv7-M ARM DDI 0403E.e.
+ **/
 BEGIN_FUNC(arm_PendSV_exception)
     b halt
 END_FUNC(arm_PendSV_exception)

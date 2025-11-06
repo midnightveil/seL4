@@ -29,6 +29,11 @@ typedef int64_t     intmax_t;
 #define INTMAX_MAX  UINT64_MAX
 #define UINTMAX_MAX INT64_MAX
 
+#define PRId32     "d"
+#define PRIi32     "i"
+#define PRIu32     "u"
+#define PRIx32     "x"
+
 #define PRId64     "lld"
 #define PRIi64     "lli"
 #define PRIu64     "llu"

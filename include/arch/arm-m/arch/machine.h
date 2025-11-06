@@ -31,3 +31,22 @@ void setNextPC(tcb_t *thread, word_t v);
     asm volatile("msr " spec_reg ", %0" :: "r"(_v) ); \
     _v; \
 })
+
+/**
+ * ARMv7-M ARM DDI 0403E.e. §B3.2.2 System control and ID Registers, B3-596/7
+ **/
+#define SCS_BASE 0xE000ED00
+#define SCS_REG32(offset) (volatile uint32_t *)(SCS_BASE + offset)
+
+#define SCS_CPUID SCS_REG32(0x00)
+#define SCS_ICSR  SCS_REG32(0x04)
+#define SCS_VTOR  SCS_REG32(0x08)
+#define SCS_AIRCR SCS_REG32(0x0C)
+#define SCS_SCR   SCS_REG32(0x10)
+#define SCS_CCR   SCS_REG32(0x14)
+#define SCS_SHPR1 SCS_REG32(0x18)
+#define SCS_SHPR2 SCS_REG32(0x1C)
+#define SCS_SHPR3 SCS_REG32(0x20)
+#define SCS_SHCSR SCS_REG32(0x24)
+/// TODO: add __FSR registers
+#define SCS_CPACR SCS_REG32(0x88)
