@@ -6,6 +6,7 @@
 
 #include <config.h>
 #include <machine/assembler.h>
+#include <arch/machine.h>
 #include <util.h>
 
 .syntax unified
@@ -52,20 +53,58 @@ arm_vector_table:
     /* TODO: pad to # interrupts */
 .size arm_vector_table, .-arm_vector_table
 
-// TODO: Can we use the stacked values for xPSR and such here too?
+.section .temp, "ax"
+BEGIN_FUNC(temp)
+    1: b 1b
+END_FUNC(temp)
+
+.extern ksCurThread
+
 .section .boot.text, "ax"
 BEGIN_FUNC(arm_Reset_exception)
     bl init_kernel
 
-    /* Restore the initial thread. Note that the function restore_user_context()
-     * could technically also be called at the end of init_kernel() directly,
-     * there is no need to return to the assembly code here at all. However, for
-     * verification things are a lot easier when init_kernel() is a normal C
-     * function that returns. The function restore_user_context() is not a
-     * normal C function and thus handled specially in verification, it does
-     * highly architecture specific things to exit to user mode.
-     */
-    b restore_user_context
+    @ We can't use the standard restore_user_context() here because that
+    @ assumes we are operating in Handler mode, where as when out of Reset
+    @ we operate in Thread (privileged) mode.
+    @
+    @ We set up all the registers to empty values, then use control to
+    @ switch to non-privileged mode.
+
+    @ Load registers in the TCB which should be zeroed.
+    ldr r0, =ksCurThread /* NODE_STATE(ksCurThread) */
+    /* XXX: This is the frame size / offset of R4. TODO: asserts */
+    @ note: r14 is LR
+    adds r0, #0x20
+    ldm r0, {r4-r11, r14}
+
+    @ FPU restore, when desired.
+
+    @ FIXME: Hack for now
+    ldr r14, =temp
+
+    msr PSP, r0
+
+    @ TODO: turn on MPU.
+
+
+    @ Set up: thread mode unprivileged using SP_process
+    movs r0, #:lower0_7:(CONTROL_nPRIV | CONTROL_SPSEL)
+    msr CONTROL, r0
+    @ "Software must use an ISB barrier instruction to ensure a
+    @  write to the CONTROL register" (per §B1.4.4)
+    isb
+
+    @ zero out r0, r1, r2, r3, r12
+    movs r0, #0
+    movs r1, #0
+    movs r2, #0
+    movs r3, #0
+    movs r12, #0
+
+    @ unfortunately this is a branch-exchange which leaks the current PC int
+    @ the initial thread's LR register. but this is relatively unimportant.
+    bx lr
 END_FUNC(arm_Reset_exception)
 
 /**

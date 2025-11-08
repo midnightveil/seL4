@@ -43,6 +43,8 @@ void VISIBLE NORETURN restore_user_context(void)
 
     assert(MRS("IPSR") != 0);
 
+    // XXX: Does this just make our stack keep incrementing?
+
     asm volatile(
         /**
          * restore the callee-saved registers, which includes the EXC_RETURN value

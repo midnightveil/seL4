@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef __ASSEMBLER__
+
 #include <arch/types.h>
 #include <util.h>
 
@@ -31,6 +33,8 @@ void setNextPC(tcb_t *thread, word_t v);
     asm volatile("msr " spec_reg ", %0" :: "r"(_v) ); \
     _v; \
 })
+
+#endif
 
 /**
  * ARMv7-M ARM DDI 0403E.e. §B3.2.2 System control and ID Registers, B3-596/7

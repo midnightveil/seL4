@@ -332,7 +332,7 @@ BOOT_CODE static bool_t try_init_kernel(void)
         return false;
     }
 
-    printf("Booting all finished, dropped to user space\n");
+    printf("Booting all finished, dropping to user space\n");
 
     // // TODO: that svc thingy..
     // // TODO: Actually what we want is to somehow be in Handler mode, since
@@ -345,12 +345,12 @@ BOOT_CODE static bool_t try_init_kernel(void)
     //  **/
     // MSR("CONTROL", CONTROL_nPRIV);
 
+    // x-ref with arm_Reset_exception return sequence
+
     static char temp_stack[0x400];
     memset(temp_stack, 0xaa, 0x400);
     // TODO, write to that stack! to setup
     initial->tcbArch.tcbContext.registers[PSP] = (word_t)temp_stack;
-    initial->tcbArch.tcbContext.registers[exc_return] = 0xFFFFFFFD;
-
     return true;
 }
 
