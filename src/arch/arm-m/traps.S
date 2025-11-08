@@ -31,13 +31,14 @@
 .align 7 /* 2^7 */
 .global arm_vector_table
 arm_vector_table:
-    /*  1 */ .word (kernel_stack_alloc + BIT(CONFIG_KERNEL_STACK_BITS))
-    /*  2 */ .word arm_Reset_exception
-    /*  3 */ .word arm_NMI_exception
-    /*  4 */ .word arm_HardFault_exception
-    /*  5 */ .word arm_MemManage_exception
-    /*  6 */ .word arm_BusFault_exception
-    /*  7 */ .word arm_UsageFault_exception
+    /*  0 */ .word (kernel_stack_alloc + BIT(CONFIG_KERNEL_STACK_BITS))
+    /*  1 */ .word arm_Reset_exception
+    /*  2 */ .word arm_NMI_exception
+    /*  3 */ .word arm_HardFault_exception
+    /*  4 */ .word arm_MemManage_exception
+    /*  5 */ .word arm_BusFault_exception
+    /*  6 */ .word arm_UsageFault_exception
+    /*  7 */ .word 0 /* Reserved */
     /*  8 */ .word 0 /* Reserved */
     /*  9 */ .word 0 /* Reserved */
     /* 10 */ .word 0 /* Reserved */
@@ -51,11 +52,6 @@ arm_vector_table:
     /* etc etc */
     /* TODO: pad to # interrupts */
 .size arm_vector_table, .-arm_vector_table
-
-.section .temp, "ax"
-BEGIN_FUNC(temp)
-    1: b 1b
-END_FUNC(temp)
 
 .extern ksCurThread
 
