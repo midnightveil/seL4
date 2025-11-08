@@ -350,7 +350,7 @@ BOOT_CODE static bool_t try_init_kernel(void)
     static char temp_stack[0x400];
     memset(temp_stack, 0xaa, 0x400);
     // TODO, write to that stack! to setup
-    initial->tcbArch.tcbContext.registers[PSP] = (word_t)temp_stack;
+    initial->tcbArch.tcbContext.registers[SP_process] = (word_t)temp_stack;
     return true;
 }
 

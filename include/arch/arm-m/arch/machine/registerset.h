@@ -40,8 +40,7 @@ enum _register {
     R11 = 15,
     exc_return = 16,
 
-    PSP = 17, /* R13 */
-    SP = PSP,
+    SP_process = 17, /* R13 */
 
     /** Extra kernel-saved state **/
     FaultIP = 18,
@@ -74,7 +73,7 @@ extern const register_t gpRegisters[];
 #define EXCEPTION_MESSAGE \
  {\
     [seL4_UserException_FaultIP] = FaultIP,\
-    [seL4_UserException_PSP] = PSP,\
+    [seL4_UserException_SP] = SP_process,\
     [seL4_UserException_xPSR] = xPSR \
  }
 
@@ -85,7 +84,7 @@ extern const register_t gpRegisters[];
     [seL4_UnknownSyscall_R2] = R2,\
     [seL4_UnknownSyscall_R3] = R3,\
     [seL4_UnknownSyscall_FaultIP] = FaultIP,\
-    [seL4_UnknownSyscall_PSP] = PSP,\
+    [seL4_UnknownSyscall_SP] = SP_process,\
     [seL4_UnknownSyscall_LR] = LR,\
     [seL4_UnknownSyscall_xPSR] = xPSR \
 }
@@ -93,7 +92,7 @@ extern const register_t gpRegisters[];
 #define TIMEOUT_REPLY_MESSAGE \
 {\
     [seL4_TimeoutReply_FaultIP] = FaultIP,\
-    [seL4_TimeoutReply_PSP] = PSP, \
+    [seL4_TimeoutReply_SP] = SP_process, \
     [seL4_TimeoutReply_R0] = R0,\
     [seL4_TimeoutReply_R1] = R1,\
     [seL4_TimeoutReply_R2] = R2,\

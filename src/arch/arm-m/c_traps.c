@@ -33,7 +33,7 @@ void VISIBLE NORETURN restore_user_context(void)
     /* Per the PopStack() pseudocode, set PSP/frameptr to the exception frame,
        which was saved on exception/interrupt entry.
      */
-    MSR("PSP", (word_t)user_context_regs[PSP]);
+    MSR("PSP", (word_t)user_context_regs[SP_process]);
 
     /** Page B1-540 tells us that if we are not in Handler mode, then loading the
      *  EXC_RETURN value produces either a MemManage or INVState UsageFault

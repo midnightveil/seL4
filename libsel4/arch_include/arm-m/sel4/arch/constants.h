@@ -12,7 +12,7 @@ typedef enum {
     seL4_UnknownSyscall_R2,
     seL4_UnknownSyscall_R3,
     seL4_UnknownSyscall_FaultIP,
-    seL4_UnknownSyscall_PSP,
+    seL4_UnknownSyscall_SP,
     seL4_UnknownSyscall_LR,
     seL4_UnknownSyscall_xPSR,
     seL4_UnknownSyscall_Syscall,
@@ -24,7 +24,7 @@ typedef enum {
 /* format of a user exception message */
 typedef enum {
     seL4_UserException_FaultIP,
-    seL4_UserException_PSP,
+    seL4_UserException_SP,
     seL4_UserException_xPSR,
     seL4_UserException_Number,
     seL4_UserException_Code,
