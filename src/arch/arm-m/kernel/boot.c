@@ -338,9 +338,9 @@ BOOT_CODE static bool_t try_init_kernel(void)
 
 
     void _user_main(void);
-    extern char _user_stack[];
+    extern word_t _user_stack_top;
 
-    initial->tcbArch.tcbContext.registers[SP_process] = (word_t)_user_stack;
+    initial->tcbArch.tcbContext.registers[SP_process] = _user_stack_top;
     initial->tcbArch.tcbContext.registers[EXC_RETURN] = (word_t)_user_main;
 
     return true;

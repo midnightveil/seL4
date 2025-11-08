@@ -148,9 +148,9 @@ long PURE str_to_long(const char *str);
 
 /* arm-none-eabi can generate calls to __aeabi_memclr4
    https://github.com/ARM-software/abi-aa/blob/2982a9f3b512a5bfdc9e3fea5d3b298f9165c36b/rtabi32/rtabi32.rst#534memory-copying-clearing-and-setting
-   HACK: word_t as size_t
+   HACK: unsigned long as size_t
 */
-void __aeabi_memclr4(void *dest, word_t n) VISIBLE;
+void __aeabi_memclr4(void *dest, unsigned long n) VISIBLE;
 
 /* Library functions for counting leading/trailing zeros.
  *

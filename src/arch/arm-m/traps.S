@@ -7,6 +7,7 @@
 #include <config.h>
 #include <machine/assembler.h>
 #include <arch/machine.h>
+#include <arch/machine/registerset.h>
 #include <util.h>
 
 .syntax unified
@@ -66,23 +67,20 @@ BEGIN_FUNC(arm_Reset_exception)
     @ We set up all the registers to empty values, then use control to
     @ switch to non-privileged mode.
 
-    @ Load registers in the TCB which should be zeroed.
+    @ Load registers from the TCB
     ldr r0, =ksCurThread /* &NODE_STATE(ksCurThread) */
     ldr r0, [r0]
-    /* XXX: This is the frame size / offset of R4. TODO: asserts */
-    @ note: r14 is LR
-    adds r0, #0x20
-    @ use ro! to incremenet past exc_return to SP_process.
-    ldm r0!, {r4-r11, r14}
+    @ offset to the kernel saved
+    adds r0, #PT_R4
+    @ load the kernel-saved (r4-r11), the SP_process into r12, and "EXC_RETURN"
+    @ which we abuse for the initial task to mean the start program counter
+    ldm r0, {r4-r11, r12, lr}
+    @ write SP_proces to PSP
+    msr PSP, r12
 
     @ FPU restore, when desired.
 
-    @ read SP_process
-    ldr r0, [r0]
-    msr PSP, r0
-
     @ TODO: turn on MPU.
-
 
     @ Set up: thread mode unprivileged using SP_process
     movs r0, #:lower0_7:(CONTROL_nPRIV | CONTROL_SPSEL)
@@ -133,7 +131,17 @@ BEGIN_FUNC(arm_UsageFault_exception)
 END_FUNC(arm_UsageFault_exception)
 
 BEGIN_FUNC(arm_SVCall_exception)
-    b halt
+    @ Get current task TCB
+    ldr r0, =ksCurThread /* &NODE_STATE(ksCurThread) */
+    ldr r0, [r0]
+    @ offset to the kernel saved registers
+    adds r0, #PT_R4
+    @ save the PSP in r12 (arbitrarily)
+    mrs r12, PSP
+    @ store the kernel-saved (r4-r11), then the PSP into SP_process,
+    @ then exc_return (in lr by hardware),
+    stm r0, {r4-r11, r12, lr}
+    b c_handle_syscall
 END_FUNC(arm_SVCall_exception)
 
 BEGIN_FUNC(arm_DebugMonitor_exception)

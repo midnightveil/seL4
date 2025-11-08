@@ -5,10 +5,12 @@
  */
 
 #include <util.h>
+#include <arch/types.h>
 
 void _user_main(void) SECTION(".user.main");
 
 char _user_stack[0x400] SECTION(".user.stack");
+word_t _user_stack_top = (word_t)&_user_stack[0x400 - 2 * sizeof(word_t)];
 
 void _user_main(void) {
     int sum = 0;
@@ -18,8 +20,8 @@ void _user_main(void) {
 
     asm volatile(
         "mov r0, %[sum]  \n"
-        /* this should panic */
-        "svc #0xff       \n"
+        /* this syscall */
+        "svc #0          \n"
         :
         : [sum] "r"(sum)
         : "memory"

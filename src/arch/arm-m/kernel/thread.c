@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, Data61, CSIRO (ABN 41 687 119 230)
+ * Copyright 2025, Julia V
  *
  * SPDX-License-Identifier: GPL-2.0-only
  */
@@ -8,7 +8,12 @@
 
 void Arch_postModifyRegisters(tcb_t *tptr)
 {
-    /* Nothing to do */
+    /* We need to copy the registers from our user_context into the PSP frame */
+
+    // TODO: check if PSP has gone away, lol.
+    // TODO: actually do.
+
+    fail("TODO");
 }
 
 void Arch_userStackTrace(tcb_t *tptr)

@@ -1,24 +1,33 @@
 #pragma once
 
+/* Offsets within the user context, these need to match the order in
+ * register_t below */
+#define PT_R4 (8 * 4)
+
+#ifndef __ASSEMBLER__ /* C only definitions */
+
+#include <util.h>
 #include <arch/types.h>
+#include <assert.h>
+#include <arch/object/structures.h>
+#include <object/structures.h>
 #include <sel4/sel4_arch/constants.h>
 
 /**
  * restore_user_context() uses the layout of the 'basic frame' (Figure B1-3),
  * with the additional kernel-saved registers (R4-R11) afterwards.
  *
+ * XXX: It might be possible to get away with only the hardware-stacked registers,
+ *      but it breaks a lot of everything if we have to read PSP to be
+ *      able to do anything, so we increase the syscall overhead by forcing
+ *      save/restore of the already saved values.
+ *
  * Also look at the PopStack() pseudocode on page B1-542.
  **/
 enum _register {
-    // TODO: I don't think we actually need this.
-
-
     /** 'Basic frame', pushed/popped by hardware **/
     /* 0x00 */ R0 = 0,
-    capRegister = R0,
-    badgeRegister = R0,
     /* 0x04 */ R1 = 1,
-    msgInfoRegister = R1,
     /* 0x08 */ R2 = 2,
     /* 0x0C */ R3 = 3,
     /* 0x10 */ R12 = 4,
@@ -27,20 +36,24 @@ enum _register {
     NextIP = PC,
     /* 0x1C */ xPSR = 7,
 
-    // TODO: The 'Extended frame' FPU registers would continue from here.
+    // The 'Extended frame' FPU registers would continue from here.
 
     /** Additional kernel-saved GP registers. The layout is important
      *  in c_traps. **/
     R4 = 8,
+    capRegister = R4,
+    badgeRegister = R4,
     R5 = 9,
+    msgInfoRegister = R5,
     R6 = 10,
     R7 = 11,
     R8 = 12,
     R9 = 13,
     R10 = 14,
+    /* used as the syscall number register */
     R11 = 15,
-    EXC_RETURN = 16,
-    SP_process = 17, /* R13 */
+    SP_process = 16, /* R13 */
+    EXC_RETURN = 17,
 
     /** Extra kernel-saved state **/
     FaultIP = 18,
@@ -53,6 +66,17 @@ typedef struct user_context {
 } user_context_t;
 
 typedef word_t register_t;
+
+unverified_compile_assert(registers_are_first_member_of_user_context,
+                          OFFSETOF(user_context_t, registers) == 0);
+#if 0
+unverified_compile_assert(user_context_is_first_member_of_arch_tcb,
+                          OFFSETOF(arch_tcb_t, user_context) == 0);
+unverified_compile_assert(arch_tcb_is_first_member_of_tcb,
+                          OFFSETOF(tcb_t, tcbArch) == 0);
+#endif
+
+compile_assert(r4_offset_correct, R4 * sizeof(word_t) == PT_R4);
 
 enum messageSizes {
     n_msgRegisters = seL4_FastMessageRegisters,
@@ -113,5 +137,8 @@ extern const register_t gpRegisters[];
 static inline void Arch_initContext(user_context_t *context)
 {
     // TODO
+    // TODO: set up frame and such?
     // context->registers[CPSR] = CPSR_USER;
 }
+
+#endif /* !__ASSEMBLER__ */

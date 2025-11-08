@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <arch/machine.h>
 #include <config.h>
 #include <machine.h>
 #include <util.h>
@@ -22,25 +23,30 @@ static inline void arch_c_entry_hook(void)
 static inline void arch_c_exit_hook(void)
 {
     // arm_load_thread_id(NODE_STATE(ksCurThread));
+
+
+    /** Page B1-540 tells us that if we are not in Handler mode, then loading the
+     *  EXC_RETURN value produces either a MemManage or INVState UsageFault
+     *  Don't let this happen; check that the current exception number is non-zero
+     *   => non-Thread mode.
+     **/
+    assert(MRS("IPSR") != 0);
 }
 
-
-/*
 void c_handle_syscall(word_t cptr, word_t msgInfo, syscall_t syscall)
-VISIBLE SECTION(".vectors.text");
+VISIBLE SECTION(".text.vectors");
 
 void c_handle_interrupt(void)
-VISIBLE SECTION(".vectors.text");
+VISIBLE SECTION(".text.vectors");
 
 void c_handle_undefined_instruction(void)
-VISIBLE SECTION(".vectors.text");
+VISIBLE SECTION(".text.vectors");
 
 void c_handle_data_fault(void)
-VISIBLE SECTION(".vectors.text");
+VISIBLE SECTION(".text.vectors");
 
 void c_handle_instruction_fault(void)
-VISIBLE SECTION(".vectors.text");
-*/
+VISIBLE SECTION(".text.vectors");
 
 void restore_user_context(void)
 VISIBLE NORETURN SECTION(".text.traps");
