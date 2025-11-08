@@ -47,6 +47,13 @@ SECTIONS
     }
 
 
+    /* TEMP HACK */
+    . = . + 0x1000;
+    .user : {
+        *(.user)
+        *(.user.*)
+    }
+
     /DISCARD/ :
     {
         *(.note.gnu.build-id)

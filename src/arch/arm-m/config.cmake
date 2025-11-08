@@ -42,6 +42,8 @@ add_sources(
         object/interrupt.c
         object/tcb.c
 
+        temp_userspace.c
+
     ASMFILES idle.S traps.S
 )
 

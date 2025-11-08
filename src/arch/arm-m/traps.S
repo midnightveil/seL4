@@ -12,7 +12,6 @@
 .syntax unified
 .thumb
 
-.extern restore_user_context
 .extern kernel_stack_alloc
 
 /**
@@ -72,17 +71,18 @@ BEGIN_FUNC(arm_Reset_exception)
     @ switch to non-privileged mode.
 
     @ Load registers in the TCB which should be zeroed.
-    ldr r0, =ksCurThread /* NODE_STATE(ksCurThread) */
+    ldr r0, =ksCurThread /* &NODE_STATE(ksCurThread) */
+    ldr r0, [r0]
     /* XXX: This is the frame size / offset of R4. TODO: asserts */
     @ note: r14 is LR
     adds r0, #0x20
-    ldm r0, {r4-r11, r14}
+    @ use ro! to incremenet past exc_return to SP_process.
+    ldm r0!, {r4-r11, r14}
 
     @ FPU restore, when desired.
 
-    @ FIXME: Hack for now
-    ldr r14, =temp
-
+    @ read SP_process
+    ldr r0, [r0]
     msr PSP, r0
 
     @ TODO: turn on MPU.
@@ -103,7 +103,7 @@ BEGIN_FUNC(arm_Reset_exception)
     movs r12, #0
 
     @ unfortunately this is a branch-exchange which leaks the current PC int
-    @ the initial thread's LR register. but this is relatively unimportant.
+    @ the initial thread's LR (R14) register. but this is relatively unimportant.
     bx lr
 END_FUNC(arm_Reset_exception)
 

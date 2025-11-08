@@ -43,4 +43,4 @@ VISIBLE SECTION(".vectors.text");
 */
 
 void restore_user_context(void)
-VISIBLE NORETURN SECTION(".text.trips");
+VISIBLE NORETURN SECTION(".text.traps");

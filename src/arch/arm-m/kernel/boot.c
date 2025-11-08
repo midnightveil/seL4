@@ -334,23 +334,13 @@ BOOT_CODE static bool_t try_init_kernel(void)
 
     printf("Booting all finished, dropping to user space\n");
 
-    // // TODO: that svc thingy..
-    // // TODO: Actually what we want is to somehow be in Handler mode, since
-    // //       that is always privileged...?
-    // /**
-    //  * B1.4.4 The special-purpose CONTROL register.
-    //  * Change "Thread" to unprivileged mode.
-    //  *
-    //  * isb() is not necessary because EXC_RETURN servers as isb?
-    //  **/
-    // MSR("CONTROL", CONTROL_nPRIV);
 
-    // x-ref with arm_Reset_exception return sequence
+    void _user_main(void);
+    extern char _user_stack[];
 
-    static char temp_stack[0x400];
-    memset(temp_stack, 0xaa, 0x400);
-    // TODO, write to that stack! to setup
-    initial->tcbArch.tcbContext.registers[SP_process] = (word_t)temp_stack;
+    initial->tcbArch.tcbContext.registers[SP_process] = (word_t)_user_stack;
+    initial->tcbArch.tcbContext.registers[EXC_RETURN] = (word_t)_user_main;
+
     return true;
 }
 

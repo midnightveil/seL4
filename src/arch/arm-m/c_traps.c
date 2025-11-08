@@ -13,8 +13,6 @@
 #include <model/statedata.h>
 #include <util.h>
 
-// #define EXC_RETURN_CONST 0xFFFFFFFD
-
 // TODO: we don't need this? I think?
 
 /** DONT_TRANSLATE */
@@ -28,7 +26,7 @@ void VISIBLE NORETURN restore_user_context(void)
 
     compile_assert(hardware_restored_frame_size, 0x20 == sizeof(word_t) * (xPSR - R0 + 1));
     compile_assert(r4_first_after_hardware_restore, 0x20 == sizeof(word_t) * (R4));
-    compile_assert(exc_return_after_r11, R11 + 1 == exc_return);
+    compile_assert(exc_return_after_r11, R11 + 1 == EXC_RETURN);
 
     /* Per the PopStack() pseudocode, set PSP/frameptr to the exception frame,
        which was saved on exception/interrupt entry.

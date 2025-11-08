@@ -29,7 +29,8 @@ enum _register {
 
     // TODO: The 'Extended frame' FPU registers would continue from here.
 
-    /** Additional kernel-saved GP registers **/
+    /** Additional kernel-saved GP registers. The layout is important
+     *  in c_traps. **/
     R4 = 8,
     R5 = 9,
     R6 = 10,
@@ -38,8 +39,7 @@ enum _register {
     R9 = 13,
     R10 = 14,
     R11 = 15,
-    exc_return = 16,
-
+    EXC_RETURN = 16,
     SP_process = 17, /* R13 */
 
     /** Extra kernel-saved state **/
