@@ -15,6 +15,8 @@
 
 // #define EXC_RETURN_CONST 0xFFFFFFFD
 
+// TODO: we don't need this? I think?
+
 /** DONT_TRANSLATE */
 void VISIBLE NORETURN restore_user_context(void)
 {
@@ -32,6 +34,14 @@ void VISIBLE NORETURN restore_user_context(void)
        which was saved on exception/interrupt entry.
      */
     MSR("PSP", (word_t)user_context_regs[PSP]);
+
+    /** Page B1-540 tells us that if we are not in Handler mode, then loading the
+     *  EXC_RETURN value produces either a MemManage or INVState UsageFault
+     *  Don't let this happen; check that the current exception number is non-zero
+     *   => non-Thread mode.
+     **/
+
+    assert(MRS("IPSR") != 0);
 
     asm volatile(
         /**
