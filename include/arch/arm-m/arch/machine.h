@@ -48,5 +48,12 @@ void setNextPC(tcb_t *thread, word_t v);
 #define SCS_SHPR2 SCS_REG32(0x1C)
 #define SCS_SHPR3 SCS_REG32(0x20)
 #define SCS_SHCSR SCS_REG32(0x24)
+#define SCS_CFSR  SCS_REG32(0x28)
 /// TODO: add __FSR registers
 #define SCS_CPACR SCS_REG32(0x88)
+
+#define CONTROL_nPRIV BIT(0)
+#define CONTROL_SPSEL BIT(1)
+
+#define xPSR_IPSR MASK(8)
+#define xPSR_EPSR_T BIT(24)

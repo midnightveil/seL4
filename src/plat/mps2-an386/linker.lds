@@ -31,19 +31,21 @@ SECTIONS
     .text : {
         _start = .; /* make LLVM happy */
         *(.text)
+        *(.text.*)
     }
 
     ki_end = .;
 
-    ki_boot_start = .;
 
     .boot : {
-        *(.boot.text)
-        *(.boot.rodata)
-        *(.boot.data)
+        ki_boot_start = .;
+
+        *(.boot)
+        *(.boot.*)
+
+        ki_boot_end = .;
     }
 
-    ki_boot_end = .;
 
     /DISCARD/ :
     {

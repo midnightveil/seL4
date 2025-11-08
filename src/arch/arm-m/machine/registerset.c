@@ -5,12 +5,13 @@
  */
 
 // from arm32 one.
+// TODO: I'm so confused what these all mean.
 
 #include <assert.h>
 #include <arch/machine/registerset.h>
 
 const register_t msgRegisters[] = {
-    R2, R3, R4, R5
+    R0, R1, R2, R3
 };
 compile_assert(
     consistent_message_registers,
@@ -18,7 +19,7 @@ compile_assert(
 );
 
 const register_t frameRegisters[] = {
-    FaultIP, SP, /* CPSR, */
+    FaultIP, PSP, xPSR,
     R0, R1, R8, R9, R10, R11, R12
 };
 // compile_assert(
@@ -27,8 +28,7 @@ const register_t frameRegisters[] = {
 // );
 
 const register_t gpRegisters[] = {
-    R2, R3, R4, R5, R6, R7, R14,
-    // TPIDRURW, TPIDRURO
+    R2, R3, R4, R5, R6, R7, LR
 };
 compile_assert(
     consistent_gp_registers,

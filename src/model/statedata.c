@@ -94,7 +94,7 @@ word_t ksDomainTime;
 word_t ksDomScheduleIdx;
 
 /* Idle thread. */
-SECTION("._idle_thread") char ksIdleThreadTCB[CONFIG_MAX_NUM_NODES][BIT(seL4_TCBBits)] ALIGN(BIT(seL4_TCBBits));
+SECTION("bss._idle_thread") char ksIdleThreadTCB[CONFIG_MAX_NUM_NODES][BIT(seL4_TCBBits)] ALIGN(BIT(seL4_TCBBits));
 
 #ifdef CONFIG_KERNEL_MCS
 /* Idle thread Schedcontexts */

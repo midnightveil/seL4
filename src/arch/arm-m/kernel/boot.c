@@ -1,3 +1,4 @@
+#include "arch/machine/registerset.h"
 #include <arch/kernel/boot.h>
 #include <kernel/boot.h>
 #include <kernel/thread.h>
@@ -37,9 +38,6 @@ BOOT_CODE static bool_t init_cpu(void)
        and available stacks.
      */
 
-#define CONTROL_nPRIV BIT(0)
-#define CONTROL_SPSEL BIT(1)
-
     word_t CONTROL = MRS("CONTROL");
     if (CONTROL & CONTROL_nPRIV) {
         printf("Execution is unprivileged\n");
@@ -55,8 +53,6 @@ BOOT_CODE static bool_t init_cpu(void)
        (a combination of APSR, IPSR, and EPSR).
        Note that the EPSR is always read-as-zero when read via an MRS.
      */
-#define xPSR_IPSR MASK(8)
-#define xPSR_EPSR_T BIT(24)
     word_t xPSR = MRS("xPSR");
     VERBOSE_CPU_PRINT("xPSR: %"SEL4_PRIx_word"\n", xPSR);
     if ((xPSR & xPSR_IPSR) != 0) {
@@ -337,6 +333,24 @@ BOOT_CODE static bool_t try_init_kernel(void)
     }
 
     printf("Booting all finished, dropped to user space\n");
+
+    // // TODO: that svc thingy..
+    // // TODO: Actually what we want is to somehow be in Handler mode, since
+    // //       that is always privileged...?
+    // /**
+    //  * B1.4.4 The special-purpose CONTROL register.
+    //  * Change "Thread" to unprivileged mode.
+    //  *
+    //  * isb() is not necessary because EXC_RETURN servers as isb?
+    //  **/
+    // MSR("CONTROL", CONTROL_nPRIV);
+
+    static char temp_stack[0x400];
+    memset(temp_stack, 0xaa, 0x400);
+    // TODO, write to that stack! to setup
+    initial->tcbArch.tcbContext.registers[PSP] = (word_t)temp_stack;
+    initial->tcbArch.tcbContext.registers[exc_return] = 0xFFFFFFFD;
+
     return true;
 }
 

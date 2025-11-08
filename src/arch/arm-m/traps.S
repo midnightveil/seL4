@@ -52,6 +52,7 @@ arm_vector_table:
     /* TODO: pad to # interrupts */
 .size arm_vector_table, .-arm_vector_table
 
+// TODO: Can we use the stacked values for xPSR and such here too?
 .section .boot.text, "ax"
 BEGIN_FUNC(arm_Reset_exception)
     bl init_kernel

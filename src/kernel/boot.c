@@ -868,9 +868,6 @@ BOOT_CODE bool_t create_untypeds(cap_t root_cnode_cap)
         }
     }
 
-#if 0
-    printf("boot types\n");
-
     /* There is a part of the kernel (code/data) that is only needed for the
      * boot process. We can create UT objects for these frames, so the memory
      * can be reused.
@@ -882,7 +879,6 @@ BOOT_CODE bool_t create_untypeds(cap_t root_cnode_cap)
                boot_mem_reuse_reg.start, boot_mem_reuse_reg.end);
         return false;
     }
-#endif
 
     /* convert remaining freemem into UT objects and provide the caps */
     for (word_t i = 0; i < ARRAY_SIZE(ndks_boot.freemem); i++) {

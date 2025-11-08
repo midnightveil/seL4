@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-only
  */
 
+#include <assert.h>
 #include <arch/kernel/traps.h>
 #include <arch/machine.h>
 #include <arch/machine/registerset.h>
@@ -12,23 +13,36 @@
 #include <model/statedata.h>
 #include <util.h>
 
+// #define EXC_RETURN_CONST 0xFFFFFFFD
+
 /** DONT_TRANSLATE */
 void VISIBLE NORETURN restore_user_context(void)
 {
     c_exit_hook();
 
-    word_t user_context_regs = (word_t) &(NODE_STATE(ksCurThread)->tcbArch.tcbContext.registers);
+    /* Look at PopStack() pseudocode on page B1-542. */
 
-    // TODO: reprog MPU?
+    word_t *user_context_regs = NODE_STATE(ksCurThread)->tcbArch.tcbContext.registers;
+
+    compile_assert(hardware_restored_frame_size, 0x20 == sizeof(word_t) * (xPSR - R0 + 1));
+    compile_assert(r4_first_after_hardware_restore, 0x20 == sizeof(word_t) * (R4));
+    compile_assert(exc_return_after_r11, R11 + 1 == exc_return);
+
+    /* Per the PopStack() pseudocode, set PSP/frameptr to the exception frame,
+       which was saved on exception/interrupt entry.
+     */
+    MSR("PSP", (word_t)user_context_regs[PSP]);
 
     asm volatile(
-        /* set stack pointer to point at r0 of user context */
-        "mov sp, %[user_context] \n"
-        /* pop user registers off the stack */
-        "pop {R0-R12}            \n"
-    // TOOD: set nPRIV on CONTOLR?
+        /**
+         * restore the callee-saved registers, which includes the EXC_RETURN value
+         * per B1.5.8, an exception return occurs when a LDM loads an EXC_RETURN
+         * value into the PC.
+         **/
+        "ldm %[kernel_restored_regs], {r4-r11, pc}       \n"
         : /* no outputs */
-        : [user_context] "r"(user_context_regs + NextIP * sizeof(word_t))
+        : [kernel_restored_regs] "r"(&user_context_regs[R4])
+        : "memory"
     );
 
     UNREACHABLE();
