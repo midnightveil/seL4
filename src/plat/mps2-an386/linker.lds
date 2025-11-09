@@ -4,6 +4,9 @@
 #include <hardware.h>
 #include <arch/machine/hardware.h>
 
+/** This is important; the ARM FVP uses this address **/
+ENTRY(arm_vector_table)
+
 SECTIONS
 {
     . = KERNEL_ELF_BASE;
@@ -11,8 +14,8 @@ SECTIONS
     /* TODO: make this at an arbitrary address as
             On reset, the processor initializes the vector table base address to an IMPLEMENTATION DEFINED address
      */
-    .isr_vector : {
-        *(isr_vector)
+    .vectors : {
+        *(.vectors)
     }
 
     .data : {
@@ -29,7 +32,6 @@ SECTIONS
     }
 
     .text : {
-        _start = .; /* make LLVM happy */
         *(.text)
         *(.text.*)
     }

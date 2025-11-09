@@ -19,9 +19,7 @@
  * Read the Armv7-M exception model, B1.5 of ARMv7-M ARM DDI 0403E.e.
  * The exception numbers and ordering of the vector table is defined in
  * Tables B1-4 and B1-5.
- **/
-.section .isr_vector, "aw"
-/**
+ *
  * > The Vector table must be naturally aligned to a power of two whose alignment
  * > value is greater than or equal to (Number of Exceptions supported x 4),
  * > with a minimum alignment of 128 bytes.
@@ -29,6 +27,7 @@
  * > defines the EPSR.T bit on exception entry.
  * TODO
  **/
+.section .vectors, "aw"
 .align 7 /* 2^7 */
 .global arm_vector_table
 arm_vector_table:
