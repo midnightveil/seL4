@@ -13,17 +13,20 @@ char _user_stack[0x400] SECTION(".user.stack");
 word_t _user_stack_top = (word_t)&_user_stack[0x400 - 2 * sizeof(word_t)];
 
 void _user_main(void) {
-    int sum = 0;
-    for (int i = 0; i < 10; i++) {
-        sum += 1;
+    for (int v = 0; v < 1000; v++) {
+        asm volatile(
+            "mov r4, %[v]  \n"
+            "mov r5, %[v]  \n"
+            /* make a SysCall */
+            "mov r11, #-1    \n"
+            /* this syscall */
+            "svc #0          \n"
+            :
+            : [v] "r"(v)
+            : "memory", "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9",
+              "r10", "r11", "r12"
+        );
     }
 
-    asm volatile(
-        "mov r0, %[sum]  \n"
-        /* this syscall */
-        "svc #0          \n"
-        :
-        : [sum] "r"(sum)
-        : "memory"
-    );
+    for (;;) {}
 }

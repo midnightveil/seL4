@@ -141,7 +141,26 @@ BEGIN_FUNC(arm_SVCall_exception)
     @ store the kernel-saved (r4-r11), then the PSP into SP_process,
     @ then exc_return (in lr by hardware),
     stm r0, {r4-r11, r12, lr}
+
+    @ prepare arguments
+    mov r0, r4  @ capRegister (TODO: assert)
+    mov r1, r5  @ msgInfoRegister (TODO: assert)
+    mov r2, r11 @ syscall_t
     b c_handle_syscall
+
+    @ Get current task TCB (it might have changed)
+    ldr r0, =ksCurThread /* &NODE_STATE(ksCurThread) */
+    ldr r0, [r0]
+    @ offset to the kernel saved registers
+    adds r0, #PT_R4
+    @ load the kernel-saved (r4-r11), the SP_process into r12,
+    @ and "EXC_RETURN" into LR
+    ldm r0, {r4-r11, r12, lr}
+    @ write SP_proces to PSP
+    msr PSP, r12
+
+    @ hardware will restore r0-r3, r12, and others
+    bx lr
 END_FUNC(arm_SVCall_exception)
 
 BEGIN_FUNC(arm_DebugMonitor_exception)
