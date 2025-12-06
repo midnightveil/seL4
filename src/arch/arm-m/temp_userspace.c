@@ -13,7 +13,7 @@ char _user_stack[0x400] SECTION(".user.stack");
 word_t _user_stack_top = (word_t)&_user_stack[0x400 - 2 * sizeof(word_t)];
 
 void _user_main(void) {
-    for (int v = 0; v < 1000; v++) {
+    for (int v = 0; v < 10; v++) {
         asm volatile(
             "mov r4, %[v]  \n"
             "mov r5, %[v]  \n"

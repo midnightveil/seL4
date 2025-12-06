@@ -269,8 +269,9 @@ BOOT_CODE static bool_t arch_init_freemem(void)
 
 BOOT_CODE static bool_t try_init_kernel(void)
 {
-    void uart_init(void);
-    uart_init();
+#ifdef CONFIG_PRINTING
+    plat_uart_init();
+#endif
 
     printf("Bootstrapping kernel\n");
 

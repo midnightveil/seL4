@@ -12,19 +12,18 @@ if(KernelPlatformMPS2-AN386)
     set(KernelArmCortexM4F ON)
     set(KernelArchArmV7em ON)
 
-    list(APPEND KernelDTSList "tools/dts/mps2-an386.dts")
-    list(APPEND KernelDTSList "src/plat/mps2-an386/overlay-mps2-an386.dts")
-
-    declare_default_headers(
-        TIMER_FREQUENCY 1
-        # TODO:
-        MAX_IRQ 100
-        TIMER drivers/timer/arm_systick.h
-        INTERRUPT_CONTROLLER arch/machine/nvic.h
-    )
+    # declare_default_headers(
+    #     TIMER_FREQUENCY 1
+    #     # TODO:
+    #     MAX_IRQ 100
+    #     TIMER drivers/timer/arm_systick.h
+    #     INTERRUPT_CONTROLLER arch/machine/nvic.h
+    # )
 endif()
 
 add_sources(
     DEP "KernelPlatformMPS2-AN386"
+    CFILES
+        src/drivers/serial/cmsdk-uart.c
     # CFILES src/arch/arm-m/machine/nvic.c src/arch/arm/machine/l2c_nop.c
 )

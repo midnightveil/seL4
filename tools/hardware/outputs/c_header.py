@@ -65,41 +65,38 @@ static inline CONST word_t physBase(void)
 {% endif %}
 {% endfor -%}
 
-// {0: {'index': 0, 'kernel': 'UART_PPTR', 'macro': 'CONFIG_PRINTING', 'user': True, 'kernel_size': 4096}} [Region(base=0x40004000,size=0x1000)]
-// {0: {'index': 0, 'kernel': 'NVIC_PADDR'}} [Region(base=0xe000e100,size=0xc00)]
-// {0: {'index': 0, 'kernel': 'SYSTICK_PADDR'}} [Region(base=0xe000e010,size=0x10)]
+/* KERNEL DEVICES */
+{% for (addr, macro) in sorted(kernel_macros.items()) %}
+#define {{ macro }} (KDEV_BASE + {{ "0x{:x}".format(addr) }})
+{% endfor %}
 
-// TODO: this should not be hardcoded
-#ifdef CONFIG_PRINTING
-#if defined(CONFIG_PLAT_AST1030_EVB)
-    #define UART_PADDR 0x7e784000
-#elif defined(CONFIG_PLAT_MPS2_AN386)
-    #define UART_PADDR 0x40004000
-#endif
-#endif
-
-// but this can be
-#define NVIC_PADDR 0xe000e100
-#define SYSTICK_PADDR 0xe000e010
-
+{% if len(kernel_regions) > 0 %}
 static const kernel_frame_t BOOT_RODATA kernel_device_frames[] = {
-    #ifdef CONFIG_PRINTING
+    {% for group in kernel_regions %}
+    {% if group.has_macro() %}
+    {{ group.get_macro() }}
+    {% endif %}
+    /* {{ group.get_desc() }} */
+    {% for reg in group.regions %}
     {
-        .paddr = UART_PADDR,
-        .size = 0x1000,
-        .userAvailable = true
+        .paddr = {{ "0x{:x}".format(reg.base) }},
+        {% set map_addr = group.get_map_offset(reg) %}
+        {% if map_addr in kernel_macros %}
+        .pptr = {{ kernel_macros[map_addr] }},
+        {% else %}
+        /* contains {{ ', '.join(group.labels.keys()) }} */
+        .pptr = KDEV_BASE + {{ "0x{:x}".format(map_addr) }},
+        {% endif %}
+        {% if config.arch == 'arm' %}
+        .armExecuteNever = true,
+        {% endif %}
+        .userAvailable = {{ str(group.user_ok).lower() }}
     },
-    #endif
-    {
-        .paddr = NVIC_PADDR,
-        .size = 0xc00,
-        .userAvailable = false
-    },
-    {
-        .paddr = SYSTICK_PADDR,
-        .size = 0x10,
-        .userAvailable = false
-    },
+    {% endfor %}
+    {% if group.has_macro() %}
+    {{ group.get_endif() }}
+    {% endif %}
+    {% endfor %}
 };
 
 /* Elements in kernel_device_frames may be enabled in specific configurations
@@ -110,6 +107,13 @@ static const kernel_frame_t BOOT_RODATA kernel_device_frames[] = {
  * which do not allow empty arrays. Luckily, we have not met this case yet...
  */
 #define NUM_KERNEL_DEVICE_FRAMES ARRAY_SIZE(kernel_device_frames)
+{% else %}
+/* The C parser used for formal verification process follows strict C rules,
+ * which do not allow empty arrays. Thus this is defined as NULL.
+ */
+static const kernel_frame_t BOOT_RODATA *const kernel_device_frames = NULL;
+#define NUM_KERNEL_DEVICE_FRAMES 0
+{% endif %}
 
 /* PHYSICAL MEMORY */
 static const p_region_t BOOT_RODATA avail_p_regs[] = {
@@ -209,9 +213,7 @@ def run(tree: FdtParser, hw_yaml: HardwareYaml, config: Config, kernel_config_di
         raise ValueError('You need to specify a header-out to use c header output')
 
     physical_memory, physBase = hardware.utils.memory.get_physical_memory(tree, config)
-    # kernel_regions, kernel_macros = get_kernel_devices(tree, hw_yaml, kernel_config_dict)
-    kernel_regions = []
-    kernel_macros = []
+    kernel_regions, kernel_macros = get_kernel_devices(tree, hw_yaml, kernel_config_dict)
 
     create_c_header_file(
         config,

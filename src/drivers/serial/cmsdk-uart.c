@@ -42,9 +42,9 @@
 
 #define UART_REG(x) ((volatile uint32_t *)(UART_PADDR + x))
 
+// TODO: more plat specific for an386
 #ifdef CONFIG_PRINTING
-void uart_init(void);
-void uart_init(void)
+void plat_uart_init(void)
 {
     /* Clock frequency, per DDAI 0386C (AN386) on Table 4-2 of SYSCLK is 25MHz
        For 115200 baud operation, 25MHz/115200baud = 217.
