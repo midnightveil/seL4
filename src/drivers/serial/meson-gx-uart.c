@@ -8,7 +8,7 @@
 #include <stdint.h>
 #include <util.h>
 #include <machine/io.h>
-#include <plat/machine/devices_gen.h>
+#include <plat/machine.h>
 
 #define UART_WFIFO  0x0
 #define UART_RFIFO  0x4

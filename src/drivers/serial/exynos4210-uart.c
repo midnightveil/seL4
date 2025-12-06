@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <util.h>
 #include <machine/io.h>
+#include <plat/machine.h>
 
 #define ULCON       0x0000 /* line control */
 #define UCON        0x0004 /* control */

@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <util.h>
 #include <machine/io.h>
-#include <plat/machine/devices_gen.h>
+#include <plat/machine.h>
 
 #define RBR     0   /* In:  Recieve Buffer Register */
 #define THR     0   /* Out: Transmitter Holding Register */

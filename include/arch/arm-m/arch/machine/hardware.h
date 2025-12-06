@@ -1,6 +1,6 @@
 #pragma once
 
-#include <plat/machine/devices_gen.h>
+#include <plat/machine.h>
 
 /* Kernel starts at the base of physical memory.
    XXXX: We assume that there is a mapping such that VTOR points at this

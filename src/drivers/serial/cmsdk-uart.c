@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <util.h>
 #include <machine/io.h>
-#include <plat/machine/devices_gen.h>
+#include <plat/machine.h>
 
 /**
  * Documentation as per "Arm Cortex-M System Design Kit" DDI 0479D

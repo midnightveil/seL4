@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <util.h>
 #include <machine/io.h>
+#include <plat/machine.h>
 
 /* When DLAB=1, MU_IO is a baud rate register.
  * Otherwise, write to TX, read to RX */

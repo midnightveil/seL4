@@ -262,7 +262,6 @@ BOOT_CODE static bool_t arch_init_freemem(void)
     // res_reg[index] = ui_reg;
     // index += 1;
 
-    /* avail_p_regs comes from the auto-generated code */
     return init_freemem(ARRAY_SIZE(avail_p_regs), avail_p_regs,
                         index, res_reg,
                         (v_region_t){0}, 0);

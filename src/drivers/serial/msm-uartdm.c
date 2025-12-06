@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <util.h>
 #include <machine/io.h>
+#include <plat/machine.h>
 
 #define USR                   0x08
 #define UTF                   0x70

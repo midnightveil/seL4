@@ -15,7 +15,7 @@
 #include <stdint.h>
 #include <util.h>
 #include <machine/io.h>
-#include <plat/machine/devices_gen.h>
+#include <plat/machine.h>
 
 #define STAT 0x14
 #define TRANSMIT 0x1c

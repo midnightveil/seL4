@@ -8,6 +8,8 @@
 
 #include <config.h>
 
+#ifndef __ASSEMBLER__
+
 #define TIMER_CLOCK_HZ ULL_CONST(@CONFIGURE_TIMER_FREQUENCY@)
 
 enum IRQConstants {
@@ -18,3 +20,5 @@ enum IRQConstants {
 
 #include <@CONFIGURE_INTERRUPT_CONTROLLER@>
 #include <@CONFIGURE_TIMER@>
+
+#endif
