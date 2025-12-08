@@ -1,0 +1,71 @@
+#pragma once
+
+/* ARM-M specific (TODO) */
+#define NVIC_PADDR 0xe000e100
+#define SYSTICK_PADDR 0xe000e010
+
+/* TODO: ??? => instead linekr directory? */
+#define PHYS_BASE_RAW 0x0
+
+#ifdef CONFIG_PRINTING
+/* UART0_BASE */
+#define UART_PADDR 0x40070000
+#define UART_PPTR UART_PADDR
+#endif
+
+#ifndef __ASSEMBLER__
+
+#include <config.h>
+#include <mode/hardware.h>  /* for KDEV_BASE */
+#include <linker.h>         /* for BOOT_RODATA */
+#include <basic_types.h>    /* for p_region_t, kernel_frame_t (arch/types.h) */
+#include <plat/platform_gen.h>
+
+/* Wrap raw physBase location constant to give it a symbolic name in C that's
+ * visible to verification. This is necessary as there are no real constants
+ * in C except enums, and enums constants must fit in an int.
+ */
+static inline CONST word_t physBase(void)
+{
+    return PHYS_BASE_RAW;
+}
+
+// TODO: neessary?
+static const kernel_frame_t BOOT_RODATA kernel_device_frames[] = {
+    #ifdef CONFIG_PRINTING
+    {
+        .paddr = UART_PADDR,
+        .size = 0x1000,
+        .userAvailable = true
+    },
+    #endif
+    {
+        .paddr = NVIC_PADDR,
+        .size = 0xc00,
+        .userAvailable = false
+    },
+    {
+        .paddr = SYSTICK_PADDR,
+        .size = 0x10,
+        .userAvailable = false
+    },
+};
+
+/* Elements in kernel_device_frames may be enabled in specific configurations
+ * only, but the ARRAY_SIZE() macro will automatically take care of this.
+ * However, one corner case remains unsolved where all elements are disabled
+ * and this becomes an empty array effectively. Then the C parser used in the
+ * formal verification process will fail, because it follows the strict C rules
+ * which do not allow empty arrays. Luckily, we have not met this case yet...
+ */
+#define NUM_KERNEL_DEVICE_FRAMES ARRAY_SIZE(kernel_device_frames)
+
+extern char _flash_start[1], _flash_end[1];
+extern char _sram_start[1], _sram_end[1];
+
+static const p_region_t BOOT_RODATA avail_p_regs[] = {
+    { .start = (paddr_t)&_flash_start, .end = (paddr_t)&_flash_end },
+    { .start = (paddr_t)&_sram_start,  .end = (paddr_t)&_sram_end  },
+};
+
+#endif /* !__ASSEMBLER__ */
