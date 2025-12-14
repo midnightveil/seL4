@@ -2,7 +2,6 @@
 
 set -euo pipefail
 
-# qemu-system-arm -M ast1030-evb -nographic -kernel "$@"
 # M4F
 qemu-system-arm -M mps2-an386 -nographic -kernel "$@"
 # M33
