@@ -20,8 +20,8 @@ set(KernelFastpath OFF CACHE BOOL "")
 set(KernelMaxNumBootinfoUntypedCaps 50 CACHE STRING "")
 
 add_sources(
-    DEP "KernelArchARM-M"
-    PREFIX src/arch/arm-m
+    DEP "KernelArchArmv7M"
+    PREFIX src/arch/Armv7-M
     CFILES
         machine/hardware.c
         machine/nvic.c
@@ -47,4 +47,4 @@ add_sources(
     ASMFILES idle.S traps.S
 )
 
-add_bf_source_old("KernelArchARM-M" "structures.bf" "include/arch/arm-m" "arch/object")
+add_bf_source_old("KernelArchArmv7M" "structures.bf" "include/arch/Armv7-M" "arch/object")

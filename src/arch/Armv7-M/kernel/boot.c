@@ -27,13 +27,13 @@ BOOT_CODE static bool_t init_cpu(void)
     #endif
 
     /* At this point we're roughly assuming that the CPU is in reset.
-       ARMv7-M ARM DDI 0403E.e B1.5.5 "Reset behaviour" shows a set of registers
+       Armv7-M ARM DDI 0403E.e B1.5.5 "Reset behaviour" shows a set of registers
        that are set at system reset, and where possible we want to initialise
        or reset these values as desired.
      */
 
     /* We first assume that we are in "Thread Mode" and "Privileged execution".
-       Reference ARMv7-M ARM DDI 0403E.e B1.3.1 and B1.4.4.
+       Reference Armv7-M ARM DDI 0403E.e B1.3.1 and B1.4.4.
        We can't check the thread mode, but we can check the privilege level
        and available stacks.
      */
@@ -49,7 +49,7 @@ BOOT_CODE static bool_t init_cpu(void)
         return false;
     }
 
-    /* Read the Program Status Register xPSR, ref ARMv7-M ARM DDI 0403E.e B1.4.2
+    /* Read the Program Status Register xPSR, ref Armv7-M ARM DDI 0403E.e B1.4.2
        (a combination of APSR, IPSR, and EPSR).
        Note that the EPSR is always read-as-zero when read via an MRS.
      */
@@ -301,12 +301,6 @@ BOOT_CODE static bool_t try_init_kernel(void)
 
     populate_bi_frame(0, CONFIG_MAX_NUM_NODES, /* ipcbuf_vptr */ 0x0, 0x0);
 
-#ifdef CONFIG_KERNEL_MCS
-    init_sched_control(root_cnode_cap, CONFIG_MAX_NUM_NODES);
-
-    NODE_STATE(ksCurTime) = getCurrentTime();
-#endif
-
     /* create the idle thread */
     create_idle_thread();
 
@@ -354,11 +348,6 @@ BOOT_CODE VISIBLE void init_kernel(void)
     if (!result) {
         fail("ERROR: kernel init failed");
     }
-
-#ifdef CONFIG_KERNEL_MCS
-    NODE_STATE(ksCurTime) = getCurrentTime();
-    NODE_STATE(ksConsumed) = 0;
-#endif
 
     schedule();
     activateThread();

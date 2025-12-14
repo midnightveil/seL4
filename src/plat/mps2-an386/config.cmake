@@ -4,13 +4,13 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-declare_platform(mps2-an386 KernelPlatformMPS2-AN386 PLAT_MPS2_AN386 KernelArchARM-M)
+declare_platform(mps2-an386 KernelPlatformMPS2-AN386 PLAT_MPS2_AN386 KernelArchArmv7M)
 
 if(KernelPlatformMPS2-AN386)
-    declare_seL4_arch(arm-m)
+    declare_seL4_arch(Armv7-M)
 
-    set(KernelArmCortexM4F ON)
-    set(KernelArchArmV7em ON)
+    # set(KernelArmCortexM4F ON)
+    # set(KernelArchArmV7em ON)
 
     # declare_default_headers(
     #     TIMER_FREQUENCY 1

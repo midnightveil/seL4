@@ -16,7 +16,7 @@
 .extern kernel_stack_alloc
 
 /**
- * Read the Armv7-M exception model, B1.5 of ARMv7-M ARM DDI 0403E.e.
+ * Read the Armv7-M exception model, B1.5 of Armv7-M ARM DDI 0403E.e.
  * The exception numbers and ordering of the vector table is defined in
  * Tables B1-4 and B1-5.
  *
@@ -102,7 +102,7 @@ END_FUNC(arm_Reset_exception)
 
 /**
  * Each of the following exceptions behave following the ExceptionEntry()
- * psuedocode in §B1.5.6 ARMv7-M ARM DDI 0403E.e.
+ * psuedocode in §B1.5.6 Armv7-M ARM DDI 0403E.e.
  *
  * We have disabled the FPU, so framesize = 0x20 and forcealign = CCR.STKALIGN,
  * which we set to 1, so the pushed stack frame is aligned.
@@ -169,7 +169,7 @@ END_FUNC(arm_DebugMonitor_exception)
 /**
  * We use the PendSV exception to handle context switching, as per the ARM
  * recommendations in "Use of SVCall and PendSV to avoid critical code regions"
- * on B1-530 of ARMv7-M ARM DDI 0403E.e.
+ * on B1-530 of Armv7-M ARM DDI 0403E.e.
  **/
 BEGIN_FUNC(arm_PendSV_exception)
     b halt

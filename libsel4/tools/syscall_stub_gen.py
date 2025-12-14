@@ -49,7 +49,7 @@ from lxml import etree
 # Number of bits in a standard word
 WORD_SIZE_BITS_ARCH = {
     "aarch32": 32,
-    "arm-m": 32,
+    "Armv7-M": 32,
     "ia32": 32,
     "aarch64": 64,
     "ia64": 64,
@@ -62,7 +62,7 @@ WORD_SIZE_BITS_ARCH = {
 MESSAGE_REGISTERS_FOR_ARCH = {
     "aarch32": 4,
     "aarch64": 4,
-    "arm-m": 1, # TODO???
+    "Armv7-M": 1, # TODO???
     "ia32": 2,
     "ia32-mcs": 1,
     "x86_64": 4,
@@ -271,7 +271,7 @@ def init_arch_types(wordsize, args):
         CapType("seL4_ARM_CB", wordsize),
     ]
     arch_types = {
-        "arm-m": [
+        "Armv7-M": [
             StructType("seL4_UserContext", wordsize * 17, wordsize),
         ],
         "aarch32": [

@@ -86,7 +86,7 @@ elseif(KernelArchARM)
         message(FATAL_ERROR "unknown ARM KernelSel4Arch '${KernelSel4Arch}'")
     endif()
 
-elseif(KernelArchARM-M)
+elseif(KernelArchArmv7M)
     # https://doc.rust-lang.org/nightly/rustc/platform-support/thumbv7em-none-eabi.html
 
     # m4f isn't a CPU.
@@ -303,7 +303,7 @@ elseif(KernelArchARM)
         message(FATAL_ERROR "unknown ARM KernelSel4Arch '${KernelSel4Arch}'")
     endif()
 
-elseif(KernelArchARM-M)
+elseif(KernelArchArmv7M)
     KernelCommonFlags(-mfloat-abi=soft)
 
 

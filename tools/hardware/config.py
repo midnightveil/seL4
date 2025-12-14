@@ -52,7 +52,7 @@ class ARMConfig(Config):
 
 class ARMMConfig(Config):
     ''' Config class for ARM-M '''
-    arch = 'arm-m'
+    arch = 'Armv7-M'
 
     def get_kernel_phys_align(self) -> int:
         return 0
@@ -85,7 +85,7 @@ def get_arch_config(sel4arch: str, addrspace_max: int) -> Config:
     ''' Return an appropriate Config object for the given architecture '''
     if sel4arch in ['aarch32', 'aarch64', 'arm_hyp']:
         return ARMConfig(sel4arch, addrspace_max)
-    elif sel4arch in ['arm-m']:
+    elif sel4arch in ['Armv7-M']:
         return ARMMConfig(sel4arch, addrspace_max)
     elif sel4arch in ['riscv32', 'riscv64']:
         return RISCVConfig(sel4arch, addrspace_max)

@@ -21,7 +21,7 @@ static inline void debug_printExceptionInformation(void)
     printf("CFSR value was 0x%"SEL4_PRIx_word"\n", CFSR);
 
     /**
-     * Also reference B1.5.14 "List of ARMv7-M faults" which includes more
+     * Also reference B1.5.14 "List of Armv7-M faults" which includes more
      * detailed fault subtypes.
      * Also see AN209 on Fault exceptions: https://www.keil.com/appnotes/files/apnt209.pdf.
      **/

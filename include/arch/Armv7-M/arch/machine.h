@@ -16,7 +16,7 @@ void setNextPC(tcb_t *thread, word_t v);
 
 /**
  * Move to Register from Special Register
- * B3.2.2 of ARMv7-M ARM DDI 0403E.e.
+ * B3.2.2 of Armv7-M ARM DDI 0403E.e.
  */
 #define MRS(spec_reg) ({ \
     word_t _v; \
@@ -26,7 +26,7 @@ void setNextPC(tcb_t *thread, word_t v);
 
 /**
  * Move to Special Register from Arm Register
- * B3.2.3 of ARMv7-M ARM DDI 0403E.e.
+ * B3.2.3 of Armv7-M ARM DDI 0403E.e.
  */
 #define MSR(spec_reg, v) ({ \
     word_t _v = v; \
@@ -37,7 +37,7 @@ void setNextPC(tcb_t *thread, word_t v);
 #endif
 
 /**
- * ARMv7-M ARM DDI 0403E.e. §B3.2.2 System control and ID Registers, B3-596/7
+ * Armv7-M ARM DDI 0403E.e. §B3.2.2 System control and ID Registers, B3-596/7
  **/
 #define SCS_BASE 0xE000ED00
 #define SCS_REG32(offset) (volatile uint32_t *)(SCS_BASE + offset)
