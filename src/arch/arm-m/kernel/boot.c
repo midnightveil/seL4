@@ -332,8 +332,6 @@ BOOT_CODE static bool_t try_init_kernel(void)
         return false;
     }
 
-    ksNumCPUs = 1;
-
     printf("Booting all finished, dropping to user space\n");
 
 
