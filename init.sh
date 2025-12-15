@@ -23,8 +23,6 @@ then
     exit 1
 fi
 
-# https://doc.rust-lang.org/nightly/rustc/platform-support/thumbv7em-none-eabi.html
-cmake -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
-    -DCMAKE_TOOLCHAIN_FILE="$SCRIPT_PATH"/llvm.cmake -DTRIPLE="thumbv7em-none-eabi" \
+cmake -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DLLVM_TOOLCHAIN=ON \
     -DKernelVerificationBuild=OFF \
     "$SCRIPT_PATH" "$@"
