@@ -21,3 +21,13 @@ void Arch_userStackTrace(tcb_t *tptr)
     printf("user stack trace\n");
     assert(!"TODO");
 }
+
+void Arch_prepareNextDomain(void)
+{
+    /* Don't need to do anything */
+}
+
+void Arch_prepareSetDomain(tcb_t *tptr, dom_t dom)
+{
+    /* Don't need to do anything */
+}
