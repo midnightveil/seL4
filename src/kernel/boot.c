@@ -981,7 +981,7 @@ BOOT_CODE static bool_t check_reserved_memory(word_t n_reserved,
     /* Force ordering and exclusivity of reserved regions. */
     for (word_t i = 0; i < n_reserved; i++) {
         const region_t *r = &reserved[i];
-        const p_region_t p_r = pptr_to_paddr_reg(*r);
+        const p_region_t p_r UNUSED = pptr_to_paddr_reg(*r);
         printf("  [%"SEL4_PRIx_word"..%"SEL4_PRIx_word")\n", p_r.start, p_r.end);
 
         /* Reserved regions must be sane, the size is allowed to be zero. */

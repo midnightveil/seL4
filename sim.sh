@@ -3,9 +3,9 @@
 set -euo pipefail
 
 # M4F
-qemu-system-arm -M mps2-an386 -nographic -kernel "$@"
+# qemu-system-arm -M mps2-an386 -nographic -kernel "$@"
 # M33
-# qemu-system-arm -M mps3-an524 -nographic -kernel "$@"
+qemu-system-arm -M mps3-an524,remap=BRAM -nographic -kernel "$@"
 
 # use --list-params
 #~/ARM/avh-linux-x86/bin/FVP_MPS2_Cortex-M4 \

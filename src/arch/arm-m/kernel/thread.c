@@ -16,11 +16,13 @@ void Arch_postModifyRegisters(tcb_t *tptr)
     fail("TODO");
 }
 
+#ifdef CONFIG_PRINTING
 void Arch_userStackTrace(tcb_t *tptr)
 {
     printf("user stack trace\n");
     assert(!"TODO");
 }
+#endif
 
 void Arch_prepareNextDomain(void)
 {

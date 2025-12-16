@@ -86,11 +86,11 @@ elseif(KernelArchARM)
         message(FATAL_ERROR "unknown ARM KernelSel4Arch '${KernelSel4Arch}'")
     endif()
 
-elseif(KernelArchArmv7M)
-    # https://doc.rust-lang.org/nightly/rustc/platform-support/thumbv7em-none-eabi.html
+elseif(KernelArchArmM)
+#     # https://doc.rust-lang.org/nightly/rustc/platform-support/thumbv7em-none-eabi.html
 
-    # m4f isn't a CPU.
-    string(APPEND c_common_flags " -mcpu=cortex-m4")
+#     # m4f isn't a CPU.
+#     string(APPEND c_common_flags " -mcpu=cortex-m4")
 
 elseif(KernelArchRiscV)
     # The "RISC-V Instruction Set Manual, Volume I: RISC-V User-Level ISA",
@@ -303,7 +303,7 @@ elseif(KernelArchARM)
         message(FATAL_ERROR "unknown ARM KernelSel4Arch '${KernelSel4Arch}'")
     endif()
 
-elseif(KernelArchArmv7M)
+elseif(KernelArchArmM)
     KernelCommonFlags(-mfloat-abi=soft)
 
 

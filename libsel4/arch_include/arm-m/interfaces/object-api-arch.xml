@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 
-<api name="ObjectApiArmv7-M" label_prefix="Armv7-M">
+<!-- TODO: ARMv7!! -->
+<api name="ObjectApiArmvM" label_prefix="ArmvM">
     <!-- Per https://documentation-service.arm.com/static/606dc36485368c4c2b1bf62f?token=
         DDI0403E_e_armv7m_arm.pdf Arm v7-M Architecture Reference Manual
         ARM DDI 0403E.e

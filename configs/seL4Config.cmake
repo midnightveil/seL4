@@ -54,6 +54,7 @@ macro(declare_seL4_arch)
         "aarch64;KernelSel4ArchAarch64;ARCH_AARCH64"
         "arm_hyp;KernelSel4ArchArmHyp;ARCH_ARM_HYP"
         "Armv7-M;KernelSel4ArchArmv7M;ARCH_ARMV7M"
+        "Armv8-M;KernelSel4ArchArmv8M;ARCH_ARMV8M"
         "riscv32;KernelSel4ArchRiscV32;ARCH_RISCV32"
         "riscv64;KernelSel4ArchRiscV64;ARCH_RISCV64"
         "x86_64;KernelSel4ArchX86_64;ARCH_X86_64"
@@ -72,7 +73,7 @@ macro(declare_seL4_arch)
         ARCH
         "Architecture to use when building the kernel"
         "arm;KernelArchARM;ARCH_ARM;KernelSel4ArchAarch32 OR KernelSel4ArchAarch64"
-        "Armv7-M;KernelArchArmv7M;ARCH_ARMV7M;KernelSel4ArchArmv7M"
+        "arm-m;KernelArchArmM;ARCH_ARM_M;KernelSel4ArchArmv7M OR KernelSel4ArchArmv8M"
         "riscv;KernelArchRiscV;ARCH_RISCV;KernelSel4ArchRiscV32 OR KernelSel4ArchRiscV64"
         "x86;KernelArchX86;ARCH_X86;KernelSel4ArchX86_64 OR KernelSel4ArchIA32"
     )
@@ -82,6 +83,7 @@ macro(declare_seL4_arch)
        OR KernelSel4ArchRiscV32
        OR KernelSel4ArchIA32
        OR KernelSel4ArchArmv7M
+       OR KernelSel4ArchArmv8M
     )
         config_set(KernelWordSize WORD_SIZE 32)
         set(Kernel64

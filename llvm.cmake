@@ -22,12 +22,12 @@ set(cross_prefix @cross_prefix@)
 
 if("${TRIPLE}" STREQUAL "")
     # https://doc.rust-lang.org/nightly/rustc/platform-support/thumbv7em-none-eabi.html
-    if("${arch}" STREQUAL "Armv7-M")
+    if("${sel4_arch}" STREQUAL "Armv7-M")
         set(TRIPLE "thumbv7em-none-eabi")
-    elseif("${arch}" STREQUAL "@KernelArch@")
-        message(FATAL_ERROR "pass LLVM_TOOLCHAIN=ON to init.sh not the toolchain directly")
+    elseif("${sel4_arch}" STREQUAL "Armv8-M")
+        set(TRIPLE "thumbv8m.main-none-eabi")
     else()
-        message(FATAL_ERROR "unknown LLVM target for ${arch}")
+        message(FATAL_ERROR "unknown LLVM target for ${arch} ${sel4_arch}")
     endif()
 endif()
 

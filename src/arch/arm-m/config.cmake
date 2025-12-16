@@ -19,9 +19,10 @@ set(KernelOptimisation "-Os" CACHE STRING "")
 set(KernelFastpath OFF CACHE BOOL "")
 set(KernelMaxNumBootinfoUntypedCaps 50 CACHE STRING "")
 
+# TODO: Split by arm-8/arm-7
 add_sources(
-    DEP "KernelArchArmv7M"
-    PREFIX src/arch/Armv7-M
+    DEP "KernelArchArmM"
+    PREFIX src/arch/arm-m
     CFILES
         machine/hardware.c
         machine/nvic.c
@@ -47,4 +48,4 @@ add_sources(
     ASMFILES idle.S traps.S
 )
 
-add_bf_source_old("KernelArchArmv7M" "structures.bf" "include/arch/Armv7-M" "arch/object")
+add_bf_source_old("KernelArchArmM" "structures.bf" "include/arch/${KernelArch}" "arch/object")

@@ -50,6 +50,7 @@ from lxml import etree
 WORD_SIZE_BITS_ARCH = {
     "aarch32": 32,
     "Armv7-M": 32,
+    "Armv8-M": 32,
     "ia32": 32,
     "aarch64": 64,
     "ia64": 64,
@@ -63,6 +64,7 @@ MESSAGE_REGISTERS_FOR_ARCH = {
     "aarch32": 4,
     "aarch64": 4,
     "Armv7-M": 1, # TODO???
+    "Armv8-M": 1, # TODO???
     "ia32": 2,
     "ia32-mcs": 1,
     "x86_64": 4,
@@ -272,6 +274,9 @@ def init_arch_types(wordsize, args):
     ]
     arch_types = {
         "Armv7-M": [
+            StructType("seL4_UserContext", wordsize * 17, wordsize),
+        ],
+        "Armv8-M": [
             StructType("seL4_UserContext", wordsize * 17, wordsize),
         ],
         "aarch32": [
