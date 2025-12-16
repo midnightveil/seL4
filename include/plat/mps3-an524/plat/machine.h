@@ -39,7 +39,7 @@ enum IRQConstants {
 
 
 #ifdef CONFIG_PRINTING
-#define UART_PADDR 0x40004000
+#define UART_PADDR 0x41303000
 #define UART_PPTR UART_PADDR
 #endif
 
