@@ -50,12 +50,6 @@ devices:
         kernel_size: 0x100000
     interrupts:
       INTERRUPT_VGIC_MAINTENANCE: 0
-  # ARM NVIC (interrupt-controller/arm,nvic.yaml)
-  - compatible:
-      - arm,v7m-nvic
-    regions:
-      - index: 0
-        kernel: NVIC_PADDR
 
   # Broadcom second level IRQ controller (interrupt-controller/brcm,bcm2835-armctrl-ic.txt),
   - compatible:
@@ -151,14 +145,6 @@ devices:
         kernel: TIMER_PPTR
     interrupts:
       # IMX6 also has the imx31-gpt.
-      KERNEL_TIMER_IRQ: 0
-  # ARMv7M System Timer "SysTick" (timer/arm,armv7m-systick.yaml)
-  - compatible:
-      - arm,armv7m-systick
-    regions:
-      - index: 0
-        kernel: SYSTICK_PADDR
-    interrupts:
       KERNEL_TIMER_IRQ: 0
   # QCOM Krait timer (timer/qcom,msm-timer.txt)
   - compatible:
