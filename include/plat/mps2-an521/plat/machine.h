@@ -76,13 +76,17 @@ static const kernel_frame_t BOOT_RODATA kernel_device_frames[] = {
  */
 #define NUM_KERNEL_DEVICE_FRAMES ARRAY_SIZE(kernel_device_frames)
 
-extern char _qspi_start[1], _qspi_end[1];
-extern char _bram_start[1], _bram_end[1];
+extern char _ssram1_start[1], _ssram1_end[1];
+extern char _ssram2_start[1], _ssram2_end[1];
+extern char _ssram3_start[1], _ssram3_end[1];
+extern char _psram_start[1], _psram_end[1];
 
 /* PHYSICAL MEMORY */
 static const p_region_t BOOT_RODATA avail_p_regs[] = {
-    { .start = (paddr_t)&_qspi_start, .end = (paddr_t)&_qspi_end },
-    { .start = (paddr_t)&_bram_start, .end = (paddr_t)&_bram_end }
+    { .start = (paddr_t)&_ssram1_start, .end = (paddr_t)&_ssram1_end },
+    { .start = (paddr_t)&_ssram2_start, .end = (paddr_t)&_ssram2_end },
+    { .start = (paddr_t)&_ssram3_start, .end = (paddr_t)&_ssram3_end },
+    { .start = (paddr_t)&_psram_start, .end = (paddr_t)&_psram_end }
 };
 
 #endif /* !__ASSEMBLER__ */

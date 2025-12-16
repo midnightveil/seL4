@@ -16,10 +16,11 @@
 #ifndef __ASSEMBLER__
 
 #include <config.h>
-#include <mode/hardware.h>  /* for KDEV_BASE */
 #include <linker.h>         /* for BOOT_RODATA */
 #include <basic_types.h>    /* for p_region_t, kernel_frame_t (arch/types.h) */
-#include <plat/platform_gen.h>
+
+#include <drivers/timer/arm_systick.h>
+#include <arch/machine/nvic.h>
 
 /* Wrap raw physBase location constant to give it a symbolic name in C that's
  * visible to verification. This is necessary as there are no real constants
@@ -29,6 +30,16 @@ static inline CONST word_t physBase(void)
 {
     return PHYS_BASE_RAW;
 }
+
+// #define TIMER_CLOCK_HZ ULL_CONST(@CONFIGURE_TIMER_FREQUENCY@)
+
+// TODO: These numbers are fake
+
+enum IRQConstants {
+    maxIRQ                      = 100
+};
+
+#define IRQ_CNODE_SLOT_BITS (7)
 
 // TODO: neessary?
 static const kernel_frame_t BOOT_RODATA kernel_device_frames[] = {

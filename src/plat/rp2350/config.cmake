@@ -4,13 +4,12 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-declare_platform(rp2350 KernelPlatformRP2350 PLAT_RP2350 KernelArchARM-M)
+declare_platform(rp2350 KernelPlatformRP2350 PLAT_RP2350 KernelArchArmM)
 
 if(KernelPlatformRP2350)
-    declare_seL4_arch(arm-m)
+    declare_seL4_arch(Armv8-M)
 
     set(KernelArmCortexM33 ON)
-    set(KernelArchArmV8m ON)
 endif()
 
 add_sources(
