@@ -37,12 +37,15 @@ BOOT_CODE p_region_t get_p_reg_kernel_img_boot(void)
     };
 }
 
+// TODO::: non-contiguos memory
 /* Returns the physical region of the kernel image. */
+extern char ki_start[1];
+extern char ki_end[1];
 BOOT_CODE p_region_t get_p_reg_kernel_img(void)
 {
     return (p_region_t) {
-        .start = kpptr_to_paddr((const void *)KERNEL_ELF_BASE),
-        .end   = kpptr_to_paddr((const void *)KERNEL_ELF_TOP)
+        .start = kpptr_to_paddr(ki_start),
+        .end   = kpptr_to_paddr(ki_end)
     };
 }
 

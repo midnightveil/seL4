@@ -32,6 +32,8 @@ _zbtsram2_end   = ORIGIN(ZBTSRAM2) + LENGTH(ZBTSRAM2);
 
 SECTIONS
 {
+    ki_start = .;
+
     .vectors : {
         *(.vectors)
     }

@@ -4,9 +4,6 @@
 #define NVIC_PADDR 0xe000e100
 #define SYSTICK_PADDR 0xe000e010
 
-/* TODO: ??? => instead linekr directory? */
-#define PHYS_BASE_RAW 0x0
-
 #ifdef CONFIG_PRINTING
 /* UART0_BASE */
 #define UART_PADDR 0x40070000
@@ -21,15 +18,6 @@
 
 #include <drivers/timer/arm_systick.h>
 #include <arch/machine/nvic.h>
-
-/* Wrap raw physBase location constant to give it a symbolic name in C that's
- * visible to verification. This is necessary as there are no real constants
- * in C except enums, and enums constants must fit in an int.
- */
-static inline CONST word_t physBase(void)
-{
-    return PHYS_BASE_RAW;
-}
 
 // #define TIMER_CLOCK_HZ ULL_CONST(@CONFIGURE_TIMER_FREQUENCY@)
 

@@ -34,6 +34,8 @@ _psram_end    = ORIGIN(PSRAM) + LENGTH(PSRAM);
 
 SECTIONS
 {
+    ki_start = .;
+
     .vectors : {
         *(.vectors)
     }

@@ -5,6 +5,10 @@
  */
 #pragma once
 
+#include <config.h>
+
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
+
 /* Each architecture defines a set of constants in #defines. These
  * constants describe the memory regions of the kernel's portion of the
  * address space including the physical memory window, the kernel ELF
@@ -52,3 +56,5 @@ extern char ki_end[1];
 #endif /* __ASSEMBLER__ */
 
 #include <mode/hardware.h>
+
+#endif

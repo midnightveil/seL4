@@ -20,6 +20,8 @@ _sram_end    = ORIGIN(SRAM) + LENGTH(SRAM);
 
 SECTIONS
 {
+    ki_start = .;
+
     .text :
     {
         /* This must be at the start of the image as used by rp2350 bootrom */
