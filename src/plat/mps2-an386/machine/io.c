@@ -1,3 +1,5 @@
+#include <arch/kernel/boot.h>
+
 void plat_uart_init(void)
 {
    /* Clock frequency, per DDAI 0386C (AN386) on Table 4-2 of SYSCLK is 25MHz
