@@ -14,21 +14,20 @@ ENTRY(arm_vector_table)
 
 MEMORY
 {
-    /* 3.4.1 External ZBT SRAMs Synchronous SRAM for Code (SSRAM1) */
-    SSRAM1 (rx) : ORIGIN = 0x0, LENGTH = 4M
+    /* 3.4.1 External ZBT SRAMs Synchronous SRAM for Code (SSRAM1) - Secure alias */
+    SSRAM1 (rx) : ORIGIN = 0x10000000, LENGTH = 4M
     /* 3.4.2 External ZBT SRAMs Synchronous SRAM (SSRAM2 and SSRAM3) */
-    SSRAM2 (rw) : ORIGIN = 0x28000000, LENGTH = 4M
-    SSRAM3 (rw) : ORIGIN = 0x28200000, LENGTH = 4M
+    SSRAM2_3 (rw) : ORIGIN = 0x38000000, LENGTH = 4M
     /* 3.4.3 PSRAM */
     PSRAM (rw)  : ORIGIN = 0x80000000, LENGTH = 16M
+
+    NS_SSRAM1 (rx) : ORIGIN = 0x0, LENGTH = 4M
 }
 
 _ssram1_start = ORIGIN(SSRAM1);
 _ssram1_end   = ORIGIN(SSRAM1) + LENGTH(SSRAM1);
-_ssram2_start = ORIGIN(SSRAM2);
-_ssram2_end   = ORIGIN(SSRAM2) + LENGTH(SSRAM2);
-_ssram3_start = ORIGIN(SSRAM3);
-_ssram3_end   = ORIGIN(SSRAM3) + LENGTH(SSRAM3);
+_ssram2_3_start = ORIGIN(SSRAM2_3);
+_ssram2_3_end   = ORIGIN(SSRAM2_3) + LENGTH(SSRAM2_3);
 _psram_start  = ORIGIN(PSRAM);
 _psram_end    = ORIGIN(PSRAM) + LENGTH(PSRAM);
 
@@ -38,7 +37,7 @@ SECTIONS
 
     .vectors : {
         *(.vectors)
-    }
+    } > SSRAM1
 
     .data : {
         *(.data)
@@ -76,5 +75,5 @@ SECTIONS
     .user : {
         *(.user)
         *(.user.*)
-    }
+    } > NS_SSRAM1
 }
