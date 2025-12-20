@@ -95,6 +95,7 @@ void NORETURN NO_INLINE VISIBLE halt(void)
 #ifdef CONFIG_DEBUG_BUILD
     debug_printKernelEntryReason();
     debug_printExceptionInformation();
+    Arch_userStackTrace(NODE_STATE(ksCurThread));
 #endif
 #endif
     idle_thread();

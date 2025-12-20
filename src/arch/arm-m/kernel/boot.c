@@ -267,13 +267,8 @@ BOOT_CODE static bool_t arch_init_freemem(void)
                         (v_region_t){0}, 0);
 }
 
-extern char ki_bss_start[1];
-extern char ki_bss_end[1];
-
 BOOT_CODE static bool_t try_init_kernel(void)
 {
-    memzero(&ki_bss_start, (word_t)&ki_bss_end - (word_t)&ki_bss_start);
-
 #ifdef CONFIG_PRINTING
     plat_uart_init();
 #endif
@@ -337,8 +332,8 @@ BOOT_CODE static bool_t try_init_kernel(void)
     void _user_main(void);
     extern word_t _user_stack_top;
 
-    initial->tcbArch.tcbContext.registers[SP_process] = _user_stack_top;
-    initial->tcbArch.tcbContext.registers[EXC_RETURN] = (word_t)_user_main;
+    initial->tcbArch.tcbContext.registers[SP_process] = (word_t)&_user_stack_top;
+    initial->tcbArch.tcbContext.registers[EXC_RETURN] = (word_t)&_user_main;
 
     return true;
 }

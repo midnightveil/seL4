@@ -14,6 +14,7 @@
 .thumb
 
 .extern kernel_stack_alloc
+.extern ki_bss_start, ki_bss_end
 
 /**
  * Read the Armv7-M exception model, B1.5 of Armv7-M ARM DDI 0403E.e.
@@ -59,6 +60,20 @@ arm_vector_table:
 BEGIN_FUNC(arm_Reset_exception)
     /* Not all platforms will look at the vector table to set the stack */
     ldr sp, =(kernel_stack_alloc + BIT(CONFIG_KERNEL_STACK_BITS))
+
+    /* zero out BSS, we can't do this in C as we can't use the stack */
+    ldr r0, =ki_bss_start
+    ldr r1, =ki_bss_end
+    /* fill value */
+    ldr r2, #0
+_zero_bss_start:
+    cmp r1, r0
+    /* if r1 > r0, break */
+    bhi _zero_bss_done
+    /* zero out r0 */
+    str r2, [r0]
+    b _zero_bss_start
+_zero_bss_done:
 
     bl init_kernel
 

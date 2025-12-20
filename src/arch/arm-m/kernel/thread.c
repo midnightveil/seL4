@@ -19,8 +19,24 @@ void Arch_postModifyRegisters(tcb_t *tptr)
 #ifdef CONFIG_PRINTING
 void Arch_userStackTrace(tcb_t *tptr)
 {
-    printf("user stack trace\n");
-    assert(!"TODO");
+    word_t sp = getRegister(tptr, SP_process);
+    if (!IS_ALIGNED(sp, seL4_WordSizeBits)) {
+        printf("SP not aligned\n");
+        return;
+    }
+
+    for (word_t i = 0; i < CONFIG_USER_STACK_TRACE_LENGTH; i++) {
+        word_t address = sp + (i * sizeof(word_t));
+        /* TODO: validate address */
+        word_t value = *(word_t *)(address);
+            printf("0x%lx: 0x%lx\n", (long)address, (long)value);
+#if 0
+        if (result.status == EXCEPTION_NONE) {
+        } else {
+            printf("0x%lx: INVALID\n", (long)address);
+        }
+#endif
+    }
 }
 #endif
 
