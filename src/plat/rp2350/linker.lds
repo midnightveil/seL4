@@ -49,13 +49,12 @@ SECTIONS
         *(.rodata.*)
     } >SRAM
 
-    /* word-sized alignment for memzero */
-    .bss : ALIGN(32) {
+    /* word-sized alignment for memzero; 4 bytes */
+    .bss : ALIGN(4) {
         ki_bss_start = .;
 
         *(.bss)
         *(.bss.*)
-        *(COMMON)
 
         ki_bss_end = .;
     } >SRAM

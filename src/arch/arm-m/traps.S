@@ -65,13 +65,15 @@ BEGIN_FUNC(arm_Reset_exception)
     ldr r0, =ki_bss_start
     ldr r1, =ki_bss_end
     /* fill value */
-    ldr r2, #0
+    movs r2, #0
 _zero_bss_start:
-    cmp r1, r0
-    /* if r1 > r0, break */
-    bhi _zero_bss_done
-    /* zero out r0 */
+    cmp r0, r1
+    /* exit out if r0 >= r1 */
+    bhs _zero_bss_done
+    /* zero out r0; word-sized stores */
     str r2, [r0]
+    /* r0 += 4 */
+    adds r0, r0, #4
     b _zero_bss_start
 _zero_bss_done:
 
