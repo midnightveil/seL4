@@ -20,7 +20,9 @@ _sram_end    = ORIGIN(SRAM) + LENGTH(SRAM);
 
 SECTIONS
 {
-    ki_start = .;
+    __sram_start : {
+        ki_start = .;
+    } > SRAM
 
     .text :
     {
@@ -35,19 +37,16 @@ SECTIONS
         /* There's no point boot.text being separate because it has to live
            in flash anyway. */
         *(.boot.text)
-    } >FLASH
+    } >SRAM
 
     .data : {
         *(.data)
-    } >SRAM AT>FLASH
+    } >SRAM
 
     .rodata : {
         *(.rodata)
         *(.rodata.*)
-
-    /* TODO: this gives weird addresses now */
-    ki_end = .;
-    } >FLASH
+    } >SRAM
 
     .bss (NOLOAD): {
         *(.bss)
@@ -62,13 +61,16 @@ SECTIONS
         *(.boot.bss)
 
         ki_boot_end = .;
-    } >SRAM AT>FLASH
+    } >SRAM
 
     /* TEMP HACK */
     . = . + 0x1000;
     .user : {
         *(.user)
         *(.user.*)
-    } >SRAM AT>FLASH
+    } >SRAM
 
+    __sram_end : {
+        ki_end = .;
+    } >SRAM
 }
