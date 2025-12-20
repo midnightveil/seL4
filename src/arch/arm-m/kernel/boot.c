@@ -45,7 +45,7 @@ BOOT_CODE static bool_t init_cpu(void)
     } else if (CONTROL & CONTROL_SPSEL) {
         /* If using our bootcode, the initial stack the vector table starts with
            is the SP_main per B1.5.5 */
-        printf("Stack pointer is SP_process, expected SP_main\n");
+        printf("ERROR: Stack pointer is SP_process, expected SP_main\n");
         return false;
     }
 
@@ -58,7 +58,7 @@ BOOT_CODE static bool_t init_cpu(void)
     if ((xPSR & xPSR_IPSR) != 0) {
         /* The IPSR contains the value 0 in Thread Mode, or the exception number
            in Handler mode. */
-        printf("In Handler mode with Exception Number %"SEL4_PRIx_word"\n", xPSR & xPSR_IPSR);
+        printf("ERROR: In Handler mode with Exception Number %"SEL4_PRIx_word"\n", xPSR & xPSR_IPSR);
         return false;
     }
 
@@ -267,8 +267,13 @@ BOOT_CODE static bool_t arch_init_freemem(void)
                         (v_region_t){0}, 0);
 }
 
+extern char ki_bss_start[1];
+extern char ki_bss_end[1];
+
 BOOT_CODE static bool_t try_init_kernel(void)
 {
+    memzero(&ki_bss_start, (word_t)&ki_bss_end - (word_t)&ki_bss_start);
+
 #ifdef CONFIG_PRINTING
     plat_uart_init();
 #endif

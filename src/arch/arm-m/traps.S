@@ -57,6 +57,9 @@ arm_vector_table:
 
 .section .boot.text, "ax"
 BEGIN_FUNC(arm_Reset_exception)
+    /* Not all platforms will look at the vector table to set the stack */
+    ldr sp, =(kernel_stack_alloc + BIT(CONFIG_KERNEL_STACK_BITS))
+
     bl init_kernel
 
     @ We can't use the standard restore_user_context() here because that
@@ -74,7 +77,7 @@ BEGIN_FUNC(arm_Reset_exception)
     @ load the kernel-saved (r4-r11), the SP_process into r12, and "EXC_RETURN"
     @ which we abuse for the initial task to mean the start program counter
     ldm r0, {r4-r11, r12, lr}
-    @ write SP_proces to PSP
+    @ write SP_process to PSP
     msr PSP, r12
 
     @ FPU restore, when desired.

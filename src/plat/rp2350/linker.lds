@@ -9,8 +9,8 @@ ENTRY(arm_Reset_exception)
 
 MEMORY
 {
-    FLASH (rx)  : ORIGIN = 0x10000000, LENGTH = 520K
-    SRAM (rwx)  : ORIGIN = 0x20000000, LENGTH = 4M
+    FLASH (rx)  : ORIGIN = 0x10000000, LENGTH = 4M
+    SRAM (rwx)  : ORIGIN = 0x20000000, LENGTH = 520K
 }
 
 _flash_start = ORIGIN(FLASH);
@@ -41,6 +41,7 @@ SECTIONS
 
     .data : {
         *(.data)
+        *(.data.*)
     } >SRAM
 
     .rodata : {
@@ -48,12 +49,18 @@ SECTIONS
         *(.rodata.*)
     } >SRAM
 
-    .bss (NOLOAD): {
+    /* word-sized alignment for memzero */
+    .bss : ALIGN(32) {
+        ki_bss_start = .;
+
         *(.bss)
         *(.bss.*)
+        *(COMMON)
+
+        ki_bss_end = .;
     } >SRAM
 
-    .boot.data : {
+    .boot : {
         ki_boot_start = .;
 
         *(.boot.data)
@@ -73,4 +80,8 @@ SECTIONS
     __sram_end : {
         ki_end = .;
     } >SRAM
+
+    /DISCARD/ : {
+        *(.ARM.exidx)
+    }
 }

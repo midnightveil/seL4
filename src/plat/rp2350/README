@@ -1,0 +1,9 @@
+# rp2350
+
+`openocd -f interface/cmsis-dap.cfg -f target/rp2350.cfg -c "adapter speed 5000"`
+
+need to use the https://github.com/raspberrypi/openocd/ fork which has the rp2350 config
+
+load over gdb with `target extended-remote localhost:3333` when linker setup everything in SRAM
+then you can just do `monitor reset init` `load kernel.elf` `continue`
+
