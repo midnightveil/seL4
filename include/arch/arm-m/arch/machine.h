@@ -43,6 +43,19 @@ void setNextPC(tcb_t *thread, word_t v);
 })
 
 /**
+ * Armv7-M ARM DDI 0403E.e B3.2 System Control Space (SCS)
+ *  > address range 0xE000E000 to 0xE000EFFF
+ *
+ * Armv8-M ARM DDI 0553B.y B8.3 The System Control Space (SCS);
+ * specifically B8.2 The System region of the system address map (R_MHGM)
+ *  > address range 0xE000E000 to 0xE000EFFF
+ **/
+static const p_region_t system_control_space_reg BOOT_RODATA = {
+    .start = 0xE000E000,
+    .end   = 0xE000EFFF,
+};
+
+/**
  *
  * System Control Block, part of the System Control Space
  *

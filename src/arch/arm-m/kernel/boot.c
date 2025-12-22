@@ -281,6 +281,11 @@ BOOT_CODE static bool_t try_init_kernel(void)
         return false;
     }
 
+    if (!reserve_region(system_control_space_reg)) {
+        printf("ERROR: failed to reserve System Control Space region\n");
+        return false;
+    }
+
     if (!plat_init_freemem()) {
         printf("ERROR: free memory management initialisation failed\n");
         return false;
