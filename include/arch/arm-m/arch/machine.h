@@ -60,6 +60,10 @@ static inline void isb(void)
  * Armv8-M ARM DDI 0553B.y B8.3 The System Control Space (SCS);
  * specifically B8.2 The System region of the system address map (R_MHGM)
  *  > address range 0xE000E000 to 0xE000EFFF
+ *
+ * Unprivileged accesses to these registers are either RAZ/WI or generate a
+ * fault, so we don't need to explicitly setup memory protection for these
+ * registers.
  **/
 static const p_region_t system_control_space_reg BOOT_RODATA = {
     .start = 0xE000E000,
