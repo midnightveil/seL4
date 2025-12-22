@@ -17,7 +17,7 @@ static inline void debug_printExceptionInformation(void)
     /* B1.4.2 Interrupt Program Status Register */
     word_t IPSR = xPSR & xPSR_IPSR;
     /* B3.2.15 Configurable Fault Sytatus Register, page B3-609 */
-    word_t CFSR = *SCS_CFSR;
+    word_t CFSR = *SCB_CFSR;
     printf("CFSR value was 0x%"SEL4_PRIx_word"\n", CFSR);
 
     /**

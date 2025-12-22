@@ -102,8 +102,8 @@ BOOT_CODE static bool_t init_cpu(void)
     VERBOSE_CPU_PRINT("VTOR (initial): 0x%"PRIx32"\n", *SCS_VTOR);
     /** "Software can write all 1s to the TBLOFF field and then read the register
      *   to find the maximum supported offset value." */
-    *SCS_VTOR = UINT32_MAX;
-    uint32_t vtor_supported = *SCS_VTOR;
+    *SCB_VTOR = UINT32_MAX;
+    uint32_t vtor_supported = *SCB_VTOR;
     VERBOSE_CPU_PRINT("VTOR (max supported): 0x%"PRIx32"\n", vtor_supported);
 
 #define VTOR_RESERVED MASK(6)
@@ -118,7 +118,7 @@ BOOT_CODE static bool_t init_cpu(void)
     VERBOSE_CPU_PRINT("VTOR (desired): 0x%"PRIx32"\n", tbloff);
 
     assert((tbloff & VTOR_RESERVED) == 0);
-    *SCS_VTOR = tbloff;
+    *SCB_VTOR = tbloff;
 
     VERBOSE_CPU_PRINT("VTOR (final): 0x%"PRIx32"\n", *SCS_VTOR);
 
@@ -142,7 +142,7 @@ BOOT_CODE static bool_t init_cpu(void)
      *
      * TODO: Do we want/need a different value?
      **/
-    *SCS_AIRCR = AIRCR_VECTKEY | AIRCR_PRIGROUP(0);
+    *SCB_AIRCR = AIRCR_VECTKEY | AIRCR_PRIGROUP(0);
 
     /**
      * 5. System Control Register, SCR (B3.2.7)
@@ -150,7 +150,7 @@ BOOT_CODE static bool_t init_cpu(void)
      * It is RW. Reset value is 0x0. This is about various sleep states.
      **/
     VERBOSE_CPU_PRINT("SCR: 0x%"PRIx32"\n", *SCS_SCR);
-    *SCS_SCR = 0x0;
+    *SCB_SCR = 0x0;
 
     /**
      * 6. Configuration and Control Register, CCR (B3.2.8)
@@ -172,7 +172,7 @@ BOOT_CODE static bool_t init_cpu(void)
 #define CCR_STKALIGN BIT(9)
 #define CCR_BFHFNMIGN BIT(8)
 #define CCR_DIV_0_TRP BIT(4)
-    *SCS_CCR = CCR_BP | CCR_IC | CCR_DC | CCR_STKALIGN | CCR_BFHFNMIGN | CCR_DIV_0_TRP;
+    *SCB_CCR = CCR_BP | CCR_IC | CCR_DC | CCR_STKALIGN | CCR_BFHFNMIGN | CCR_DIV_0_TRP;
 
     VERBOSE_CPU_PRINT("CCR (now): 0x%"PRIx32"\n", *SCS_CCR);
 
@@ -195,15 +195,15 @@ BOOT_CODE static bool_t init_cpu(void)
      **/
     static const uint8_t SV_PRIORITY = 0b11111111;
 
-    *SCS_SHPR1 = /* PRI_4 (MemManage)     */ (0 <<  0)
+    *SCB_SHPR1 = /* PRI_4 (MemManage)     */ (0 <<  0)
                | /* PRI_5 (BusFault)      */ (0 <<  8)
                | /* PRI_6 (UsageFault)    */ (0 << 16)
                | /* PRI_7 (reserved)      */ (0 << 24);
-    *SCS_SHPR2 = /* PRI_8 (reserved)      */ (0 <<  0)
+    *SCB_SHPR2 = /* PRI_8 (reserved)      */ (0 <<  0)
                | /* PRI_9 (reserved)      */ (0 <<  8)
                | /* PRI_10 (reserved)     */ (0 << 16)
                | /* PRI_11 (SVCall)       */ (SV_PRIORITY << 24);
-    *SCS_SHPR3 = /* PRI_12 (DebugMonitor) */ (0 <<  0)
+    *SCB_SHPR3 = /* PRI_12 (DebugMonitor) */ (0 <<  0)
                | /* PRI_13 (reserved)     */ (0 <<  8)
                | /* PRI_14 (PendSV)       */ (SV_PRIORITY << 16)
                | /* PRI_15 (SysTick)      */ (0 << 24);
@@ -219,7 +219,7 @@ BOOT_CODE static bool_t init_cpu(void)
 #define SHCSR_USGFAULTENA BIT(18)
 #define SHCSR_BUSFAULTENA BIT(17)
 #define SHCSR_MEMFAULTENA BIT(16)
-    *SCS_SHCSR = SHCSR_USGFAULTENA | SHCSR_BUSFAULTENA | SHCSR_MEMFAULTENA;
+    *SCB_SHCSR = SHCSR_USGFAULTENA | SHCSR_BUSFAULTENA | SHCSR_MEMFAULTENA;
 
     /* Now we are done configuring the SCS
        If adding FPU support, add the configuration of those registers here: */
@@ -281,8 +281,8 @@ BOOT_CODE static bool_t try_init_kernel(void)
         return false;
     }
 
-    if (!arch_init_freemem()) {
-        printf("ERROR: free memory management initialization failed\n");
+    if (!plat_init_freemem()) {
+        printf("ERROR: free memory management initialisation failed\n");
         return false;
     }
 
