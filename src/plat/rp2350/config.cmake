@@ -19,5 +19,6 @@ add_sources(
     CFILES
         src/drivers/serial/pl011.c
         src/plat/rp2350/machine/io.c
+        src/plat/rp2350/kernel/boot.c
     # CFILES src/arch/arm-m/machine/nvic.c src/arch/arm/machine/l2c_nop.c
 )

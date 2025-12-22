@@ -243,30 +243,6 @@ BOOT_CODE static void init_irqs(cap_t root_cnode_cap)
     write_slot(SLOT_PTR(pptr_of_cap(root_cnode_cap), seL4_CapIRQControl), cap_irq_control_cap_new());
 }
 
-BOOT_BSS static region_t res_reg[NUM_RESERVED_REGIONS];
-
-BOOT_CODE static bool_t arch_init_freemem(void)
-{
-    /* Reserve the kernel image region. This may look a bit awkward, as the
-     * symbols are a reference in the kernel image window, but all allocations
-     * are done in terms of the main kernel window, so we do some translation.
-     */
-    res_reg[0] = paddr_to_pptr_reg(get_p_reg_kernel_img());
-    int index = 1;
-
-    // /* reserve the user image region */
-    // if (index >= ARRAY_SIZE(res_reg)) {
-    //     printf("ERROR: no slot to add user image to reserved regions\n");
-    //     return false;
-    // }
-    // res_reg[index] = ui_reg;
-    // index += 1;
-
-    return init_freemem(ARRAY_SIZE(avail_p_regs), avail_p_regs,
-                        index, res_reg,
-                        (v_region_t){0}, 0);
-}
-
 BOOT_CODE static bool_t try_init_kernel(void)
 {
 #ifdef CONFIG_PRINTING

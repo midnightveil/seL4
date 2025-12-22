@@ -69,13 +69,6 @@ SECTIONS
         ki_boot_end = .;
     } >SRAM
 
-    /* TEMP HACK */
-    . = . + 0x1000;
-    .user : {
-        *(.user)
-        *(.user.*)
-    } >SRAM
-
     __sram_end : {
         ki_end = .;
     } >SRAM
@@ -83,4 +76,11 @@ SECTIONS
     /DISCARD/ : {
         *(.ARM.exidx)
     }
+
+    /* TEMP HACK */
+    . = . + 0x1000;
+    .user : {
+        *(.user)
+        *(.user.*)
+    } >SRAM
 }
