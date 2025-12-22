@@ -38,4 +38,8 @@ BOOT_CODE static inline void fp_HWDisable(void)
     /* 0b00 = Access denied. Any attempted access generates a NOCP UsageFault. */
     CPACR &= ~CPACR_CP_FPU_MASK;
     *SCB_CPACR = CPACR;
+
+    /* Ensure effects of the writes */
+    dsb();
+    isb();
 }

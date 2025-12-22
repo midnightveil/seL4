@@ -221,6 +221,10 @@ BOOT_CODE static bool_t init_cpu(void)
 #define SHCSR_MEMFAULTENA BIT(16)
     *SCB_SHCSR = SHCSR_USGFAULTENA | SHCSR_BUSFAULTENA | SHCSR_MEMFAULTENA;
 
+    /* Ensure all our writes are in effect */
+    dsb();
+    isb();
+
     /* Now we are done configuring the SCS
        If adding FPU support, add the configuration of those registers here: */
 

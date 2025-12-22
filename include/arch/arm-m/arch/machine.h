@@ -5,6 +5,7 @@
 #include <arch/types.h>
 #include <basic_types.h>
 #include <linker.h>
+#include <object/structures.h>
 #include <util.h>
 
 /* Cleaning memory before user-level access. Does not flush cache. */
@@ -15,6 +16,16 @@ static inline void clearMemory(word_t *ptr, word_t bits)
 
 word_t PURE getRestartPC(tcb_t *thread);
 void setNextPC(tcb_t *thread, word_t v);
+
+static inline void dsb(void)
+{
+    asm volatile("dsb" ::: "memory");
+}
+
+static inline void isb(void)
+{
+    asm volatile("isb" ::: "memory");
+}
 
 /**
  * Move to Register from Special Register
@@ -35,8 +46,6 @@ void setNextPC(tcb_t *thread, word_t v);
  * Usually, this requires a Context synchronisation event to guarantee that
  * changes to the special register affect instructions executing later in
  * program order.
- *
- * TODO: AUDIT this.
  */
 #define MSR(spec_reg, v) ({ \
     word_t _v = v; \
