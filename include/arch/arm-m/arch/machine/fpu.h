@@ -1,6 +1,7 @@
 #pragma once
 
 #include <arch/machine.h>
+#include <basic_types.h>
 #include <linker.h>
 
 #define CPACR_CPn_MASK(n) (BIT(2 * n + 1) | BIT(2 * n))

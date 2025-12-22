@@ -3,6 +3,8 @@
 #ifndef __ASSEMBLER__
 
 #include <arch/types.h>
+#include <basic_types.h>
+#include <linker.h>
 #include <util.h>
 
 /* Cleaning memory before user-level access. Does not flush cache. */
