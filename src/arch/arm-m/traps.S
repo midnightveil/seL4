@@ -50,11 +50,14 @@ _zero_bss_done:
     @ Load registers from the TCB
     ldr r0, =ksCurThread /* &NODE_STATE(ksCurThread) */
     ldr r0, [r0]
+    @ grab the NextIP for the notionally-hardware saved registers, which we've
+    @ set with the value for the initial task
+    ldr lr, [r0, #PT_NextIP]
     @ offset to the kernel saved
     adds r0, #PT_R4
-    @ load the kernel-saved (r4-r11), the SP_process into r12, and "EXC_RETURN"
-    @ which we abuse for the initial task to mean the start program counter
-    ldm r0, {r4-r11, r12, lr}
+    @ load the kernel-saved (r4-r11), the SP_process into r12, and ignore
+    @ EXC_RETURN.
+    ldm r0, {r4-r11, r12}
     @ write SP_process to PSP
     msr PSP, r12
 
@@ -76,7 +79,7 @@ _zero_bss_done:
     movs r3, #0
     movs r12, #0
 
-    @ unfortunately this is a branch-exchange which leaks the current PC int
+    @ unfortunately this is a branch-exchange which leaks the current PC into
     @ the initial thread's LR (R14) register. but this is relatively unimportant.
     bx lr
 END_FUNC(arm_Reset_exception)
@@ -136,7 +139,7 @@ BEGIN_FUNC(arm_SVCall_exception)
     @ load the kernel-saved (r4-r11), the SP_process into r12,
     @ and "EXC_RETURN" into LR
     ldm r0, {r4-r11, r12, lr}
-    @ write SP_proces to PSP
+    @ write SP_process to PSP
     msr PSP, r12
 
     @ hardware will restore r0-r3, r12, and others

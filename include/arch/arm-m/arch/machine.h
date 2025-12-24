@@ -16,6 +16,7 @@ static inline void clearMemory(word_t *ptr, word_t bits)
 
 word_t PURE getRestartPC(tcb_t *thread);
 void setNextPC(tcb_t *thread, word_t v);
+void setNextSP(tcb_t *thread, word_t v);
 
 static inline void dsb(void)
 {

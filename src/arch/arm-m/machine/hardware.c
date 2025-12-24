@@ -12,3 +12,8 @@ void setNextPC(tcb_t *thread, word_t v)
 {
     setRegister(thread, NextIP, v);
 }
+
+void setNextSP(tcb_t *thread, word_t v)
+{
+    setRegister(thread, SP_process, v);
+}

@@ -97,7 +97,8 @@ create_initial_thread(
     vptr_t ipcbuf_vptr,
     cap_t  ipcbuf_cap
 #else
-    vptr_t ui_entry
+    paddr_t ui_entry,
+    paddr_t ui_initial_stack
 #endif
 );
 

@@ -546,7 +546,7 @@ BOOT_CODE void create_idle_thread(void)
 BOOT_CODE tcb_t *create_initial_thread(cap_t root_cnode_cap, cap_t it_pd_cap, vptr_t ui_v_entry, vptr_t bi_frame_vptr,
                                        vptr_t ipcbuf_vptr, cap_t ipcbuf_cap)
 #else
-BOOT_CODE tcb_t *create_initial_thread(cap_t root_cnode_cap, vptr_t ui_v_entry)
+BOOT_CODE tcb_t *create_initial_thread(cap_t root_cnode_cap, paddr_t ui_entry, paddr_t ui_initial_stack)
 #endif
 {
     tcb_t *tcb = TCB_PTR(rootserver.tcb + TCB_OFFSET);
@@ -586,7 +586,8 @@ BOOT_CODE tcb_t *create_initial_thread(cap_t root_cnode_cap, vptr_t ui_v_entry)
 
     setRegister(tcb, capRegister, bi_frame_vptr);
 #endif
-    setNextPC(tcb, ui_v_entry);
+    setNextPC(tcb, ui_entry);
+    setNextSP(tcb, ui_initial_stack);
 
     /* initialise TCB */
 #ifdef CONFIG_KERNEL_MCS

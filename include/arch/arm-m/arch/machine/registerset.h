@@ -1,8 +1,10 @@
 #pragma once
 
-/* Offsets within the user context, these need to match the order in
- * register_t below */
+// TODO: what does PT mean?
+/* Offsets within the user context for assembly, these need to match the order
+ * in user_context_t below */
 #define PT_R4 (8 * 4)
+#define PT_NextIP (6 * 4)
 
 #ifndef __ASSEMBLER__ /* C only definitions */
 
@@ -61,11 +63,12 @@ enum _register {
     n_contextRegisters
 };
 
+typedef word_t register_t;
+
 typedef struct user_context {
-    word_t registers[n_contextRegisters];
+    register_t registers[n_contextRegisters];
 } user_context_t;
 
-typedef word_t register_t;
 
 unverified_compile_assert(registers_are_first_member_of_user_context,
                           OFFSETOF(user_context_t, registers) == 0);
@@ -76,7 +79,8 @@ unverified_compile_assert(arch_tcb_is_first_member_of_tcb,
                           OFFSETOF(tcb_t, tcbArch) == 0);
 #endif
 
-compile_assert(r4_offset_correct, R4 * sizeof(word_t) == PT_R4);
+compile_assert(r4_offset_correct, R4 * sizeof(register_t) == PT_R4);
+compile_assert(nextip_offset_correct, NextIP * sizeof(register_t) == PT_NextIP);
 
 enum messageSizes {
     n_msgRegisters = seL4_FastMessageRegisters,

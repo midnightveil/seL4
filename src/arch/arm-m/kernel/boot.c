@@ -1,5 +1,6 @@
-#include "arch/machine/registerset.h"
 #include <arch/kernel/boot.h>
+#include <arch/kernel/traps.h>
+#include <arch/machine/registerset.h>
 #include <kernel/boot.h>
 #include <kernel/thread.h>
 #include <linker.h>
@@ -285,14 +286,9 @@ BOOT_CODE static bool_t try_init_kernel(void)
     /* create the idle thread */
     create_idle_thread();
 
-    tcb_t *initial = create_initial_thread(
-                         root_cnode_cap,
-                         // it_pd_cap,
-                         /* ui_entry */ 0x80000000
-                         // bi_frame_vptr,
-                         // ipcbuf_vptr,
-                         // ipcbuf_cap
-                     );
+    tcb_t *initial = create_initial_thread(root_cnode_cap,
+                                           /* ui_entry */ 0x80000000,
+                                           /* ui_initial_stack */ 0x80000100);
 
     if (initial == NULL) {
         printf("ERROR: could not create initial thread\n");
@@ -308,13 +304,6 @@ BOOT_CODE static bool_t try_init_kernel(void)
     }
 
     printf("Booting all finished, dropping to user space\n");
-
-
-    void _user_main(void);
-    extern word_t _user_stack_top;
-
-    initial->tcbArch.tcbContext.registers[SP_process] = (word_t)&_user_stack_top;
-    initial->tcbArch.tcbContext.registers[EXC_RETURN] = (word_t)&_user_main;
 
     return true;
 }
