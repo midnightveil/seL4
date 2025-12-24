@@ -9,10 +9,6 @@
 #include <object/objecttype.h>
 #include <util.h>
 
-/* need a fake array to get the pointer from the linker script */
-// TODO: this should be a proper array at some point.
-extern char arm_vector_table[1];
-
 /** This and only this function initialises the CPU.
  *
  * It does NOT initialise any kernel state.

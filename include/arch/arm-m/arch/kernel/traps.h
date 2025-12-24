@@ -15,6 +15,8 @@
 #include <machine.h>
 #include <util.h>
 
+extern word_t arm_vector_table[];
+
 static inline void arch_c_entry_hook(void)
 {
     // arm_save_thread_id(NODE_STATE(ksCurThread));
