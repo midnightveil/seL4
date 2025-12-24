@@ -23,7 +23,11 @@ typedef enum {
     Entry_UnknownSyscall,
     Entry_UserLevelFault,
     Entry_DebugFault,
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
     Entry_VMFault,
+#else
+    Entry_MemoryFault,
+#endif
     Entry_Syscall,
 #ifdef CONFIG_ARCH_ARM
     Entry_VCPUFault,

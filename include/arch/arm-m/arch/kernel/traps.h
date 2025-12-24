@@ -41,14 +41,5 @@ VISIBLE SECTION(".text.vectors");
 void c_handle_interrupt(void)
 VISIBLE SECTION(".text.vectors");
 
-void c_handle_undefined_instruction(void)
+void c_handle_exception(void)
 VISIBLE SECTION(".text.vectors");
-
-void c_handle_data_fault(void)
-VISIBLE SECTION(".text.vectors");
-
-void c_handle_instruction_fault(void)
-VISIBLE SECTION(".text.vectors");
-
-void restore_user_context(void)
-VISIBLE NORETURN SECTION(".text.traps");

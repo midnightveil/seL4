@@ -30,9 +30,15 @@ static inline void debug_printKernelEntryReason(void)
     case Entry_UnknownSyscall:
         printf("Unknown syscall, word: %lu\n", (unsigned long) ksKernelEntry.word);
         break;
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
     case Entry_VMFault:
         printf("VM Fault, fault type: %lu\n", (unsigned long) ksKernelEntry.word);
         break;
+#else
+    case Entry_MemoryFault:
+        printf("Memory fault, fault type: %lu\n", (unsigned long) ksKernelEntry.word);
+        break;
+#endif
     case Entry_UserLevelFault:
         printf("User level fault, number: %lu\n", (unsigned long) ksKernelEntry.word);
         break;

@@ -93,25 +93,34 @@ END_FUNC(arm_Reset_exception)
  **/
 
 .section .text.vectors, "ax"
-BEGIN_FUNC(arm_NMI_exception)
-    b halt
-END_FUNC(arm_NMI_exception)
+BEGIN_FUNC(arm_handle_exception)
+    @ Get current task TCB
+    ldr r0, =ksCurThread /* &NODE_STATE(ksCurThread) */
+    ldr r0, [r0]
+    @ offset to the kernel saved registers
+    adds r0, #PT_R4
+    @ save the PSP in r12 (arbitrarily, it is hardware-stacked)
+    mrs r12, PSP
+    @ store the kernel-saved (r4-r11), then the PSP into SP_process,
+    @ then exc_return (in lr by hardware),
+    stm r0, {r4-r11, r12, lr}
 
-BEGIN_FUNC(arm_HardFault_exception)
-    b halt
-END_FUNC(arm_HardFault_exception)
+    b c_handle_exception
 
-BEGIN_FUNC(arm_MemManage_exception)
-    b halt
-END_FUNC(arm_MemManage_exception)
+    @ Get current task TCB (it might have changed)
+    ldr r0, =ksCurThread /* &NODE_STATE(ksCurThread) */
+    ldr r0, [r0]
+    @ offset to the kernel saved registers
+    adds r0, #PT_R4
+    @ load the kernel-saved (r4-r11), the SP_process into r12,
+    @ and "EXC_RETURN" into LR
+    ldm r0, {r4-r11, r12, lr}
+    @ write SP_process to PSP
+    msr PSP, r12
 
-BEGIN_FUNC(arm_BusFault_exception)
-    b halt
-END_FUNC(arm_BusFault_exception)
-
-BEGIN_FUNC(arm_UsageFault_exception)
-    b halt
-END_FUNC(arm_UsageFault_exception)
+    @ hardware will restore r0-r3, r12, and others
+    bx lr
+END_FUNC(arm_handle_exception)
 
 BEGIN_FUNC(arm_SVCall_exception)
     @ Get current task TCB
@@ -146,14 +155,13 @@ BEGIN_FUNC(arm_SVCall_exception)
     bx lr
 END_FUNC(arm_SVCall_exception)
 
-BEGIN_FUNC(arm_DebugMonitor_exception)
-    b halt
-END_FUNC(arm_DebugMonitor_exception)
-
 /**
  * We use the PendSV exception to handle context switching, as per the ARM
  * recommendations in "Use of SVCall and PendSV to avoid critical code regions"
  * on B1-530 of Armv7-M ARM DDI 0403E.e.
+ * TODO do we though?
+ * -> only for timers? because ticking. otherwise being able to only save
+ * -> state sometimes doesn't really help much since it would be slower
  **/
 BEGIN_FUNC(arm_PendSV_exception)
     b halt
