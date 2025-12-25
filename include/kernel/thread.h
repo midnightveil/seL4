@@ -211,6 +211,7 @@ void Arch_postModifyRegisters(tcb_t *tptr);
  * not cause the fault again. */
 static inline void updateRestartPC(tcb_t *tcb)
 {
+    fail("updateRestartPC");
     setRegister(tcb, FaultIP, getRegister(tcb, NextIP));
 }
 

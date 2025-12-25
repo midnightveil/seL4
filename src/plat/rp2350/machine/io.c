@@ -1,4 +1,7 @@
 #include <arch/kernel/boot.h>
+#include <config.h>
+
+#ifdef CONFIG_PRINTING
 
 #define PUT32(address, value) (*((volatile unsigned int *)(address))) = value
 #define GET32(address) (*(volatile unsigned int *)(address))
@@ -51,3 +54,5 @@ void plat_uart_init(void) {
     PUT32((0x40070000 + 0x2c), (( 0x3 << 5 ) | ( 1 << 4 )));               // UARTLCR_H: Word lenght = 8, FIFO RX/TX enabled
     PUT32((0x40070000 + 0x30), ((   1 << 9 ) | ( 1 << 8 ) | ( 1 << 0 )));  // UARTCR: UART Enabled, Tx enabled, Rx enabled
 }
+
+#endif
