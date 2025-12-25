@@ -40,6 +40,7 @@ add_sources(
         # machine/debug.c
         # machine/hardware.c
         machine/io.c
+        model/statedata.c
         object/objecttype.c
         object/interrupt.c
         object/tcb.c

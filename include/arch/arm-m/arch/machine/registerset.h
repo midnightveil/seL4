@@ -140,9 +140,26 @@ extern const register_t gpRegisters[];
 
 static inline void Arch_initContext(user_context_t *context)
 {
-    // TODO
-    // TODO: set up frame and such?
-    // context->registers[CPSR] = CPSR_USER;
+    // TODO: why is secure
+    // TODO: more on xPSR
+
+#ifndef CONFIG_ARCH_ARMV8M
+    #error need to figure out secure/non-secure
+#endif
+
+    context->registers[EXC_RETURN] = 0xFFFFFF00
+                                   | /* S = secure   */ (1 ? BIT(6) : 0)
+                                   // | /* S = non-secure   */ (0 ? BIT(6) : 0)
+    // xxx: I don't understand what this means.  RWCGV on p121 says that if EXC_RETURN.S=1 and EXC_RETURN.DCRS=0 then we try the additional state, which we don't want.
+                                   | /* DCRS = default rules followed   */ (1 ? BIT(5) : 0)
+                                   | /* FType = standard */ (1 ? BIT(4) : 0)
+                                   | /* Mode = thread    */ (1 ? BIT(3) : 0)
+                                   | /* SPSEL = process  */ (1 ? BIT(2) : 0)
+                                   | /* reserved         */ (0 ? BIT(1) : 0)
+                                   | /* exception sec = 1*/ (1 ? BIT(0) : 0);
+                                   // | /* exception sec = 1*/ (0 ? BIT(0) : 0);
+
+    context->registers[xPSR] = BIT(24); // thumb mode
 }
 
 #endif /* !__ASSEMBLER__ */

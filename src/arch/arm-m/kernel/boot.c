@@ -213,10 +213,8 @@ BOOT_CODE static bool_t init_cpu(void)
      * Writing to any of the pending/active is fine as they should all be 0.
      **/
     VERBOSE_CPU_PRINT("SHCSR: 0x%"PRIx32"\n", *SCS_SHCSR);
-#define SHCSR_USGFAULTENA BIT(18)
-#define SHCSR_BUSFAULTENA BIT(17)
-#define SHCSR_MEMFAULTENA BIT(16)
-    *SCB_SHCSR = SHCSR_USGFAULTENA | SHCSR_BUSFAULTENA | SHCSR_MEMFAULTENA;
+
+    *SCB_SHCSR = SHCSR_USGFAULTENA | SHCSR_BUSFAULTENA | SHCSR_MEMFAULTENA | SHCSR_SECUREFAULTENA;
 
     /* Ensure all our writes are in effect */
     dsb();
