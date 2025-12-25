@@ -6,6 +6,7 @@
 
 #include <api/syscall.h>
 #include <arch/fastpath/fastpath.h>
+#include <arch/kernel/mpu.h>
 #include <arch/kernel/traps.h>
 #include <arch/machine.h>
 #include <arch/machine/registerset.h>
@@ -45,7 +46,11 @@ word_t arm_vector_table[16] ALIGN(128) SECTION(".vectors") = {
     [ 4] = (word_t)&arm_handle_exception, /* MemManage */
     [ 5] = (word_t)&arm_handle_exception, /* BusFault */
     [ 6] = (word_t)&arm_handle_exception, /* UsageFault */
+#ifdef CONFIG_ARCH_ARMV8M
+    [ 7] = (word_t)&arm_handle_exception, /* SecureFault */
+#else
     [ 7] = 0 /* Reserved */,
+#endif
     [ 8] = 0 /* Reserved */,
     [ 9] = 0 /* Reserved */,
     [10] = 0 /* Reserved */,
@@ -107,56 +112,55 @@ void c_handle_exception(void)
 
     // TODO: check exc_return to see if we can from handle mode, i.e. nested, then goto kernel_abort
 
+    word_t CFSR = *SCB_CFSR;
+
     switch (exception_number) {
-    case 4: /* MemManage */
-        printf("MemManage\n");
+    case 4: /* MemManage */ {
 #ifdef TRACK_KERNEL_ENTRIES
         ksKernelEntry.path = Entry_MemoryFault;
         ksKernelEntry.word = exception_number;
 #endif
-        halt();
+        handleMemManageFault(CFSR);
         break;
+    }
 
-    case 5: /* BusFault */
-        printf("BusFault\n");
+    case 5: /* BusFault */ {
 #ifdef TRACK_KERNEL_ENTRIES
         ksKernelEntry.path = Entry_MemoryFault;
         ksKernelEntry.word = exception_number;
 #endif
-        halt();
+        handleBusFault(CFSR);
         break;
+    }
 
-    case 6: /* UsageFault */
-        printf("UsageFault\n");
+    case 6: /* UsageFault */ {
 #ifdef TRACK_KERNEL_ENTRIES
         ksKernelEntry.path = Entry_UserLevelFault;
         ksKernelEntry.word = exception_number;
 #endif
-        halt();
+        handleUserLevelFault(CFSR_UFSR_EXTRACT(CFSR), 0);
         break;
+    }
 
     // These can happen, as they are routed here, but they should not happen
     case 1: /* Reset */
     case 2: /* NMI */
     case 3: /* HardFault */
+#ifdef CONFIG_ARCH_ARMV8M
+    case 7: /* SecureFault */
+#endif
     case 12: /* DebugMonitor */
         goto kernel_abort;
 
     // Other numbers should be impossible to go this path.
     default:
         assert("unreachable");
-        UNREACHABLE();
         break;
     }
 
-#ifdef TRACK_KERNEL_ENTRIES
-    ksKernelEntry.word = xPSR;
-    ksKernelEntry.is_fastpath = 0;
-#endif
-
-    halt();
-
     c_exit_hook();
+
+    return;
 
 kernel_abort:
     printf("KERNEL ABORT: exception %"SEL4_PRIu_word"\n", (word_t)exception_number);

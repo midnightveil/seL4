@@ -33,6 +33,7 @@ add_sources(
         c_traps.c
         # benchmark/benchmark.c
         kernel/boot.c
+        kernel/mpu.c
         kernel/thread.c
         # machine/cache.c
         # machine/errata.c

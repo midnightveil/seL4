@@ -98,7 +98,11 @@ static const p_region_t system_control_space_reg BOOT_RODATA = {
 #define SCB_SHPR3 SCB_REG32(0x20)
 #define SCB_SHCSR SCB_REG32(0x24)
 #define SCB_CFSR  SCB_REG32(0x28)
-/// TODO: add __FSR registers
+#define SCB_HFSR  SCB_REG32(0x2C)
+#define SCB_DFSR  SCB_REG32(0x30)
+#define SCB_MMFAR SCB_REG32(0x34)
+#define SCB_BFAR  SCB_REG32(0x38)
+#define SCB_AFSR  SCB_REG32(0x3C)
 #define SCB_CPACR SCB_REG32(0x88)
 
 #endif
@@ -108,3 +112,15 @@ static const p_region_t system_control_space_reg BOOT_RODATA = {
 
 #define xPSR_IPSR MASK(8)
 #define xPSR_EPSR_T BIT(24)
+
+// TODO: ARMv7
+
+/* D1.2.11 of Armv8-M ARM DDI 0553B.y */
+#define CFSR_BFSR_EXTRACT(CFSR)  ((CFSR >> 8) & 0xf)
+#define CFSR_MMFSR_EXTRACT(CFSR) ((CFSR >> 0) & 0xf)
+#define CFSR_UFSR_EXTRACT(CFSR)  ((CFSR >> 16) & 0xff)
+
+/* D1.2.167 of Armv8-M ARM DDI 0553B.y */
+#define MMFSR_MMFARVALID BIT(7)
+/* D1.2.7 of Armv8-M ARM DDI 0553B.y */
+#define BFSR_BFARVALID BIT(7)

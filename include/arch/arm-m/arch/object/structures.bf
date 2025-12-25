@@ -42,4 +42,20 @@ tagged_union cap capType {
 #endif
 }
 
+-- ARM-M specific fault types
+
+block MemManageFault {
+    field MMFAR 32
+    field MMFSR 8
+    padding 20
+    field seL4_FaultType 4
+}
+
+block BusFault {
+    field BFAR 32
+    field BFSR 8
+    padding 20
+    field seL4_FaultType 4
+}
+
 #include <sel4/arch/shared_types.bf>

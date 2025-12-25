@@ -121,6 +121,19 @@ static void print_fault(seL4_Fault_t f)
                (void *)seL4_Fault_VMFault_get_address(f),
                (void *)seL4_Fault_VMFault_get_FSR(f));
         break;
+#else
+    case seL4_Fault_BusFault:
+        printf("bus fault on address %p (valid: %s) with status 0x%x",
+               (void *)seL4_Fault_BusFault_get_BFAR(f),
+               (seL4_Fault_BusFault_get_BFSR(f) & BFSR_BFARVALID) ? "yes" : "no",
+               seL4_Fault_BusFault_get_BFSR(f));
+        break;
+    case seL4_Fault_MemManageFault:
+        printf("memmanage fault on address %p (valid: %s) with status 0x%x",
+               (void *)seL4_Fault_MemManageFault_get_MMFAR(f),
+               (seL4_Fault_MemManageFault_get_MMFSR(f) & MMFSR_MMFARVALID) ? "yes" : "no",
+               seL4_Fault_MemManageFault_get_MMFSR(f));
+        break;
 #endif
     case seL4_Fault_UnknownSyscall:
         printf("unknown syscall %p",

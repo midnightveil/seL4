@@ -10,6 +10,6 @@ tagged_union seL4_Fault seL4_FaultType {
     tag Timeout 5
 #endif
     -- arch specific faults
-    -- TODO: not a VM fault anymore
-    -- tag VMFault 6
+    tag BusFault 6
+    tag MemManageFault 7
 }

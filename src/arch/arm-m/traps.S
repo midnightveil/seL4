@@ -105,7 +105,7 @@ BEGIN_FUNC(arm_handle_exception)
     @ then exc_return (in lr by hardware),
     stm r0, {r4-r11, r12, lr}
 
-    b c_handle_exception
+    bl c_handle_exception
 
     @ Get current task TCB (it might have changed)
     ldr r0, =ksCurThread /* &NODE_STATE(ksCurThread) */
@@ -138,7 +138,7 @@ BEGIN_FUNC(arm_SVCall_exception)
     mov r0, r4  @ capRegister (TODO: assert)
     mov r1, r5  @ msgInfoRegister (TODO: assert)
     mov r2, r11 @ syscall_t
-    b c_handle_syscall
+    bl c_handle_syscall
 
     @ Get current task TCB (it might have changed)
     ldr r0, =ksCurThread /* &NODE_STATE(ksCurThread) */
