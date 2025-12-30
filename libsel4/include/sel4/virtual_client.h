@@ -25,3 +25,19 @@ LIBSEL4_INLINE seL4_Error seL4_SchedControl_Configure(seL4_SchedControl _service
                                             seL4_SchedContext_NoFlag);
 }
 #endif
+
+#ifndef CONFIG_KERNEL_MCS
+LIBSEL4_INLINE_FUNC void seL4_Wait(seL4_CPtr src, seL4_Word *sender)
+{
+    seL4_Recv(src, sender);
+}
+#endif
+
+LIBSEL4_INLINE_FUNC seL4_MessageInfo_t seL4_Poll(seL4_CPtr src, seL4_Word *sender)
+{
+#ifdef CONFIG_KERNEL_MCS
+    return seL4_NBWait(src, sender);
+#else
+    return seL4_NBRecv(src, sender);
+#endif
+}

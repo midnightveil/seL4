@@ -20,11 +20,12 @@
 #include <sel4/virtual_client.h>
 
 #include <sel4/bootinfo.h>
-#include <sel4/faults.h>
-#include <sel4/deprecated.h>
+// TODO:
+// #include <sel4/faults.h>
+// #include <sel4/deprecated.h>
 #include <sel4/constants.h>
 #include <sel4/sel4_arch/constants.h>
 #include <sel4/arch/constants.h>
-#include <sel4/plat/api/constants.h>
+// #include <sel4/plat/api/constants.h>
 
 

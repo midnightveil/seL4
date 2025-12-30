@@ -26,6 +26,6 @@
         <member name="r1"/>
         <member name="r0"/>
 
-        <member name="apsr"/> <!-- application program status register -->
+        <member name="xPSR"/>
     </struct>
 </api>

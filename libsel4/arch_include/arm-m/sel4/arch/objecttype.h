@@ -1,6 +1,6 @@
 #pragma once
 
-#include <basic_types.h>
+#include <sel4/config.h>
 
 typedef enum _object {
     seL4_ARM_M_XXXXObject,

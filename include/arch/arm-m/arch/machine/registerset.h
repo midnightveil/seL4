@@ -52,6 +52,9 @@ enum _register {
     R8 = 12,
     R9 = 13,
     R10 = 14,
+#ifdef CONFIG_KERNEL_MCS
+    replyRegister = R10,
+#endif
     /* used as the syscall number register */
     R11 = 15,
     SP_process = 16, /* R13 */

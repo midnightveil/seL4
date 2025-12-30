@@ -63,8 +63,8 @@ WORD_SIZE_BITS_ARCH = {
 MESSAGE_REGISTERS_FOR_ARCH = {
     "aarch32": 4,
     "aarch64": 4,
-    "Armv7-M": 1, # TODO???
-    "Armv8-M": 1, # TODO???
+    "Armv7-M": 4, # TODO???
+    "Armv8-M": 4, # TODO???
     "ia32": 2,
     "ia32-mcs": 1,
     "x86_64": 4,
