@@ -15,5 +15,5 @@
  * address of the stack is per-arch-mode aligned. KERNEL_STACK_ALIGNMENT is
  * defined for each arch/mode in <mode/kernel/stack.h>
  */
-extern char kernel_stack_alloc[CONFIG_MAX_NUM_NODES][BIT(CONFIG_KERNEL_STACK_BITS)];
+extern char kernel_stack_alloc[CONFIG_MAX_NUM_NODES][BIT(CONFIG_KERNEL_STACK_BITS)] SECTION(".kernel_stack");
 

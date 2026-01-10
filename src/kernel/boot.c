@@ -27,25 +27,25 @@ BOOT_BSS static region_t rootserver_mem;
 
 /* Returns the physical region of the kernel image boot part, which is the part
  * that is no longer needed once booting is finished. */
-extern char ki_boot_start[1];
-extern char ki_boot_end[1];
+extern char ki_boot_sram_start[1];
+extern char ki_boot_sram_end[1];
 BOOT_CODE p_region_t get_p_reg_kernel_img_boot(void)
 {
     return (p_region_t) {
-        .start = kpptr_to_paddr(ki_boot_start),
-        .end   = kpptr_to_paddr(ki_boot_end)
+        .start = kpptr_to_paddr(ki_boot_sram_start),
+        .end   = kpptr_to_paddr(ki_boot_sram_end)
     };
 }
 
 // TODO::: non-contiguos memory
 /* Returns the physical region of the kernel image. */
-extern char ki_start[1];
-extern char ki_end[1];
+extern char ki_sram_start[1];
+extern char ki_sram_end[1];
 BOOT_CODE p_region_t get_p_reg_kernel_img(void)
 {
     return (p_region_t) {
-        .start = kpptr_to_paddr(ki_start),
-        .end   = kpptr_to_paddr(ki_end)
+        .start = kpptr_to_paddr(ki_sram_start),
+        .end   = kpptr_to_paddr(ki_sram_end)
     };
 }
 

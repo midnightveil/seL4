@@ -6,12 +6,9 @@
 #include <machine.h>
 #include <plat/machine.h>
 
-extern char _flash_start[1], _flash_end[1];
 extern char _sram_start[1], _sram_end[1];
 
 static const p_region_t BOOT_RODATA normal_memory[] = {
-    // Flash is not normal memory....
-    // { .start = (paddr_t)&_flash_start, .end = (paddr_t)&_flash_end },
     { .start = (paddr_t)&_sram_start,  .end = (paddr_t)&_sram_end  },
 };
 

@@ -15,28 +15,53 @@
 
 .extern kernel_stack_alloc
 .extern ki_bss_start, ki_bss_end
+.extern ki_relocation_regions, ki_relocation_regions_end
 .extern ksCurThread
 
 .section .boot.text, "ax"
 BEGIN_FUNC(arm_Reset_exception)
+    /* zero out BSS, we can't do this in C as we can't use the stack */
+    ldr r0, =ki_bss_start  @ incremented during loop
+    ldr r1, =ki_bss_end
+    @ fill value
+    movs r2, #0
+_zero_bss_begin:
+    cmp r0, r1
+    @ exit out if r0 >= r1
+    bhs _zero_bss_done
+    @ zero out r0; word-sized stores; then r0 += 4
+    str r2, [r0], #4
+    b _zero_bss_begin
+_zero_bss_done:
+
+    /* relocate data from flash to sram */
+    ldr r0, =ki_relocation_regions_start   @ incremented during loop
+    ldr r1, =ki_relocation_regions_end
+_relocate_regions_compare:
+    cmp r0, r1
+    @ exit out if r0 >= r1
+    bhs _relocate_regions_done
+
+    ldr r2, [r0], #4 @ r2: addr, incremented
+    ldr r3, [r0], #4 @ r3: loadaddr, incremented
+    ldr r4, [r0], #4 @ r4: size
+    adds r4, r2, r4  @ r4: end addr
+_relocate_reg_compare:
+    cmp r2, r4
+    @ exit if r2 (addr) >= r4 (end)
+    bhs _relocate_reg_done
+
+    @ copy from load to addr
+    ldr r5, [r3], #4
+    str r5, [r2], #4
+
+    b _relocate_reg_compare
+_relocate_reg_done:
+    b _relocate_regions_compare
+_relocate_regions_done:
+
     /* Not all platforms will look at the vector table to set the stack */
     ldr sp, =(kernel_stack_alloc + BIT(CONFIG_KERNEL_STACK_BITS))
-
-    /* zero out BSS, we can't do this in C as we can't use the stack */
-    ldr r0, =ki_bss_start
-    ldr r1, =ki_bss_end
-    /* fill value */
-    movs r2, #0
-_zero_bss_start:
-    cmp r0, r1
-    /* exit out if r0 >= r1 */
-    bhs _zero_bss_done
-    /* zero out r0; word-sized stores */
-    str r2, [r0]
-    /* r0 += 4 */
-    adds r0, r0, #4
-    b _zero_bss_start
-_zero_bss_done:
 
     bl init_kernel
 

@@ -20,38 +20,40 @@ _sram_end    = ORIGIN(SRAM) + LENGTH(SRAM);
 
 SECTIONS
 {
-    __sram_start : {
-        ki_start = .;
-    } > SRAM
-
-    .text :
-    {
+    .boot.flash : {
+        /* TODO: setup a picobin block to point to this elsewhere */
         /* This must be at the start of the image as used by rp2350 bootrom */
         KEEP(*(.vectors))
+
         /* This needs to be within the first 4k of the flash */
         KEEP(*(.picobin_blocks))
 
+        *(.boot.rodata)
+        *(.boot.text)
+    } >FLASH
+
+    .text : {
         *(.text)
         *(.text.*)
-
-        /* There's no point boot.text being separate because it has to live
-           in flash anyway. */
-        *(.boot.text)
-    } >SRAM
-
-    .data : {
-        *(.data)
-        *(.data.*)
-    } >SRAM
+    } >FLASH
 
     .rodata : {
-        *(.rodata)
-        *(.rodata.*)
-    } >SRAM
+        *(.rodata) *(.rodata.*)
 
-    /* word-sized alignment for memzero; 4 bytes */
-    .bss : ALIGN(4) {
+        /* Array of [word_t addr, word_t load_addr, word_t size][] */
+        ki_relocation_regions_start = .;
+        LONG(ADDR(.data)); LONG(LOADADDR(.data)); LONG(SIZEOF(.data));
+        LONG(ADDR(.boot.sram)); LONG(LOADADDR(.boot.sram)); LONG(SIZEOF(.boot.sram));
+        ki_relocation_regions_end = .;
+    } >FLASH
+
+    .bss (NOLOAD) : ALIGN(4) {
+        ki_sram_start = .;
         ki_bss_start = .;
+
+        /* Make running off the bottom of the stack fault with a BusError as it
+           would be below SRAM */
+        *(.kernel_stack);
 
         *(.bss)
         *(.bss.*)
@@ -59,28 +61,23 @@ SECTIONS
         ki_bss_end = .;
     } >SRAM
 
-    .boot : {
-        ki_boot_start = .;
+    .data : ALIGN(4) {
+        *(.data)
+        *(.data.*)
+
+        ki_sram_end = .;
+    } >SRAM AT>FLASH
+
+    .boot.sram : ALIGN(4) {
+        ki_boot_sram_start = .;
 
         *(.boot.data)
-        *(.boot.rodata)
         *(.boot.bss)
 
-        ki_boot_end = .;
-    } >SRAM
-
-    __sram_end : {
-        ki_end = .;
-    } >SRAM
+        ki_boot_sram_end = .;
+    } >SRAM AT>FLASH
 
     /DISCARD/ : {
         *(.ARM.exidx)
     }
-
-    /* TEMP HACK */
-    . = . + 0x1000;
-    .user : {
-        *(.user)
-        *(.user.*)
-    } >SRAM
 }
