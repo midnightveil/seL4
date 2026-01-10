@@ -546,7 +546,8 @@ BOOT_CODE void create_idle_thread(void)
 BOOT_CODE tcb_t *create_initial_thread(cap_t root_cnode_cap, cap_t it_pd_cap, vptr_t ui_v_entry, vptr_t bi_frame_vptr,
                                        vptr_t ipcbuf_vptr, cap_t ipcbuf_cap)
 #else
-BOOT_CODE tcb_t *create_initial_thread(cap_t root_cnode_cap, paddr_t ui_entry, paddr_t ui_initial_stack)
+BOOT_CODE tcb_t *create_initial_thread(cap_t root_cnode_cap, paddr_t ui_entry, paddr_t ui_initial_stack,
+                                       paddr_t bi_frame)
 #endif
 {
     tcb_t *tcb = TCB_PTR(rootserver.tcb + TCB_OFFSET);
@@ -585,6 +586,8 @@ BOOT_CODE tcb_t *create_initial_thread(cap_t root_cnode_cap, paddr_t ui_entry, p
     tcb->tcbIPCBuffer = ipcbuf_vptr;
 
     setRegister(tcb, capRegister, bi_frame_vptr);
+#else
+    setRegister(tcb, capRegister, bi_frame);
 #endif
     setNextPC(tcb, ui_entry);
     setNextSP(tcb, ui_initial_stack);

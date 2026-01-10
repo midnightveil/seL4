@@ -98,7 +98,8 @@ create_initial_thread(
     cap_t  ipcbuf_cap
 #else
     paddr_t ui_entry,
-    paddr_t ui_initial_stack
+    paddr_t ui_initial_stack,
+    paddr_t bi_frame
 #endif
 );
 

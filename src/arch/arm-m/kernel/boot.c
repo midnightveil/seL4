@@ -286,7 +286,8 @@ BOOT_CODE static bool_t try_init_kernel(void)
 
     tcb_t *initial = create_initial_thread(root_cnode_cap,
                                            /* ui_entry */ 0x20041000 | 1, // or 1 for thumb mode
-                                           /* ui_initial_stack */ 0x20041000);
+                                           /* ui_initial_stack */ 0x20041000,
+                                           /* bootinfo_frame */ rootserver.boot_info);
 
     if (initial == NULL) {
         printf("ERROR: could not create initial thread\n");
