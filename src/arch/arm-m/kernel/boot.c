@@ -223,6 +223,34 @@ BOOT_CODE static bool_t init_cpu(void)
     /* Now we are done configuring the SCS
        If adding FPU support, add the configuration of those registers here: */
 
+// XXX: elsewhere
+#ifdef CONFIG_PLAT_RP2350
+    /**
+     * The RP2350 has 'Access control' registers in addition to the architectural
+     * IDAU and SAU-defined regions.
+     **/
+
+    /* Per 10.6 of datasheet, all access control writes need this */
+    #define ACCESSCTRL_PASSWORD 0xacce0000
+
+    #define ACCESSCTRL_BASE 0x40060000
+    #define ACCESSCTRL_REG32(offset) ((volatile uint32_t *)(ACCESSCTRL_BASE + (offset)))
+
+    /* Table 911 / 10.6.3 list of registers */
+    #define ACCESSCTRL_CFGRESET 0x08
+    #define ACCESSCTRL_CLOCKS   0xC0
+    #define ACCESSCTRL_XOSC     0xC4
+
+    // reset to defaults for most registers
+    // *ACCESSCTRL_REG32(ACCESSCTRL_CFGRESET) = ACCESSCTRL_PASSWORD | BIT(0);
+
+    // TODO: we might want to configure more registers -- or make this a syscall
+    //       but for now...
+    // set the SU (secure, unprivilged) bits on
+    *ACCESSCTRL_REG32(ACCESSCTRL_CLOCKS) |= ACCESSCTRL_PASSWORD | BIT(2);
+    *ACCESSCTRL_REG32(ACCESSCTRL_XOSC) |= ACCESSCTRL_PASSWORD | BIT(2);
+#endif
+
     return true;
 }
 
