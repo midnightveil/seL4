@@ -116,9 +116,9 @@ static const p_region_t system_control_space_reg BOOT_RODATA = {
 // TODO: ARMv7
 
 /* D1.2.11 of Armv8-M ARM DDI 0553B.y */
-#define CFSR_BFSR_EXTRACT(CFSR)  ((CFSR >> 8) & 0xf)
-#define CFSR_MMFSR_EXTRACT(CFSR) ((CFSR >> 0) & 0xf)
-#define CFSR_UFSR_EXTRACT(CFSR)  ((CFSR >> 16) & 0xff)
+#define CFSR_BFSR_EXTRACT(CFSR)  ((CFSR >> 8) & 0xff)
+#define CFSR_MMFSR_EXTRACT(CFSR) ((CFSR >> 0) & 0xff)
+#define CFSR_UFSR_EXTRACT(CFSR)  ((CFSR >> 16) & 0xffff)
 
 /* D1.2.167 of Armv8-M ARM DDI 0553B.y */
 #define MMFSR_MMFARVALID BIT(7)
