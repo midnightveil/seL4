@@ -3,9 +3,23 @@
 
 #ifdef CONFIG_PRINTING
 
-#define PUT32(address, value) (*((volatile unsigned int *)(address))) = value
-#define GET32(address) (*(volatile unsigned int *)(address))
+/*
+ * Derived from https://github.com/carlosftm/RPi-Pico2-Baremetal/blob/f3d4793/02_BlockingUART/02_BlockingUART.c#L111-L149
+ * GPL-3.0 license.
+ */
 
+#define REG32(address, offset) ((volatile uint32_t *)((address) + (offset)))
+
+/* Address map for APB bus segment, Table 13 (section 2.2.4) of RP2350 datasheet */
+#define CLOCKS_BASE     0x40010000
+#define RESETS_BASE     0x40020000
+#define IO_BANK0_BASE   0x40028000
+#define PADS_BANK0_BASE 0x40038000
+#define XOSC_BASE       0x40048000
+#define UART0_BASE      0x40070000
+
+/* 2.2.6. Core-local peripherals (SIO) */
+#define SIO_BASE        0xd0000000
 
 /* Define Atomic Register Access
    See section 2.1.3 "Atomic Register Access" on RP2350 datasheet */
@@ -16,43 +30,43 @@
 
 void plat_uart_init(void) {
     // Setup XOC clock to drive the GPIO (Pico2 board as a ABM8-272-T3 crystal that oscillates at 12MHz)
-    PUT32((0x40048000 + 0),      0x00000aa0);               //  XOC range 1-15MHz (Crystal Oschillator)
-    PUT32((0x40048000 + 0x0c),   0x000000c4);               //  Startup Delay (default = 50,000 cycles aprox.)
-    PUT32((0x40048000 + 0x2000), 0x00FAB000);               //  Enable XOC
-    while (!(GET32(0x40048000 + 4) & ( 1 << 31 )));         //  Wait for XOC stable
+    *REG32(XOSC_BASE, 0)      = 0x00000aa0;                //  XOC range 1-15MHz (Crystal Oschillator)
+    *REG32(XOSC_BASE, 0x0c)   = 0x000000c4;                //  Startup Delay (default = 50,000 cycles aprox.)
+    *REG32(XOSC_BASE, 0x2000) = 0x00FAB000;                //  Enable XOC
+    while (!(*REG32(XOSC_BASE, 4) & BIT(31)));             //  Wait for XOC stable
 
-    // Configure source clock for components (see datasheer RP2350 Chapter 8. "Clocks")
-    PUT32((0x40010000 + 0x3C), 0 );                         //  CLK SYS CTRL = XOC (for processor, bus frabric & memories)
-    PUT32((0x40010000 + 0x48), ((1 << 11) | ( 4 << 5)));    //  CLK_PERI_CTRL = XOC (for perifery UART and SPI) + Enable
+    // Configure source clock for components (see datasheet RP2350 Chapter 8. "Clocks")
+    *REG32(CLOCKS_BASE, 0x3C) = 0;                         //  CLK SYS CTRL = XOC (for processor, bus frabric & memories)
+    *REG32(CLOCKS_BASE, 0x48) = ((1 << 11) | ( 4 << 5));   //  CLK_PERI_CTRL = XOC (for perifery UART and SPI) + Enable
 
     // De-asserts the reset of UART0
-    PUT32((0x40020000 + WRITE_SET + 0x0), (1 << 26));       // Set UART0 to reset
-    asm("nop");
-    asm("nop");
-    PUT32((0x40020000 + WRITE_CLR + 0x0), (1 << 26));       // De-assert the reset from UART0
-    while (!(GET32(0x40020000 + 0x08) & (1 << 26)));        // Wait for UART0 to be ready
+    *REG32(RESETS_BASE + WRITE_SET, 0x0) = BIT(26);        // Set UART0 to reset
+    asm volatile("nop");
+    asm volatile("nop");
+    *REG32(RESETS_BASE + WRITE_CLR, 0x0) = BIT(26);        // De-assert the reset from UART0
+    while (!(*REG32(RESETS_BASE, 0x08) & BIT(26)));        // Wait for UART0 to be ready
 
     // Configure GPIO25 to use function 5 (SIO) to controll the GPIO by software
-    PUT32((0x40028000 + 0xcc), 5);                          // IO GPIO25 uses SIO
-    PUT32((0x40028000 + 0x04), 2);                          // IO GPIO0 uses UART TX
-    PUT32((0x40028000 + 0x0c), 2);                          // IO GPIO1 uses UART RX
+    *REG32(IO_BANK0_BASE, 0xcc) = 5;                       // IO GPIO25 uses SIO
+    *REG32(IO_BANK0_BASE, 0x04) = 2;                       // IO GPIO0 uses UART TX
+    *REG32(IO_BANK0_BASE, 0x0c) = 2;                       // IO GPIO1 uses UART RX
 
     // Enable GPIO out in SIO register
-    PUT32((0xd0000000 + WRITE_SET + 0x038), (1 << 25));     // SIO OE (output enable) for Pin25
+    *REG32(SIO_BASE + WRITE_SET, 0x038) = BIT(25);         // SIO OE (output enable) for Pin25
 
     // Configure the pad control (new on RP2350)
-    PUT32((0x40038000 + WRITE_CLR + 0x68), (1 << 8));       // Remove GPIO25 pad isolation
-    PUT32((0x40038000 + WRITE_CLR + 0x04), (1 << 8));       // Remove UART0TX pad isolation
-    PUT32((0x40038000 + WRITE_CLR + 0x08), (1 << 8));       // Remove UART0RX pad isolation
-    PUT32((0x40038000 + WRITE_SET + 0x08), (1 << 6));       // Enable UART0RX pad for input
+    *REG32(PADS_BANK0_BASE + WRITE_CLR, 0x68) = BIT(8);    // Remove GPIO25 pad isolation
+    *REG32(PADS_BANK0_BASE + WRITE_CLR, 0x04) = BIT(8);    // Remove UART0TX pad isolation
+    *REG32(PADS_BANK0_BASE + WRITE_CLR, 0x08) = BIT(8);    // Remove UART0RX pad isolation
+    *REG32(PADS_BANK0_BASE + WRITE_SET, 0x08) = BIT(6);    // Enable UART0RX pad for input
 
     // Configure UART0
     //   Baud: For a baud rate of 115200 with UARTCLK = 12MHz then:
     //   Baud Rate Divisor = 12000000/(16 * 115200) ~= 6.5104
-    PUT32((0x40070000 + 0x24), 6);                                         // UARTIBRD_H: Integer part of the baudrate divisor
-    PUT32((0x40070000 + 0x28), 5104);                                      // UARTFBRD_L: Decimal part of the baudrate divisor
-    PUT32((0x40070000 + 0x2c), (( 0x3 << 5 ) | ( 1 << 4 )));               // UARTLCR_H: Word lenght = 8, FIFO RX/TX enabled
-    PUT32((0x40070000 + 0x30), ((   1 << 9 ) | ( 1 << 8 ) | ( 1 << 0 )));  // UARTCR: UART Enabled, Tx enabled, Rx enabled
+    *REG32(UART0_BASE, 0x24) = 6;                          // UARTIBRD_H: Integer part of the baudrate divisor
+    *REG32(UART0_BASE, 0x28) = 5104;                       // UARTFBRD_L: Decimal part of the baudrate divisor
+    *REG32(UART0_BASE, 0x2c) = (( 0x3 << 5 ) | BIT(4));    // UARTLCR_H: Word lenght = 8, FIFO RX/TX enabled
+    *REG32(UART0_BASE, 0x30) = (BIT(9) | BIT(8) | BIT(0)); // UARTCR: UART Enabled, Tx enabled, Rx enabled
 }
 
 #endif
