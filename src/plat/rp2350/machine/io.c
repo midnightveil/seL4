@@ -40,9 +40,6 @@ void plat_uart_init(void) {
     *REG32(CLOCKS_BASE, 0x48) = ((1 << 11) | ( 4 << 5));   //  CLK_PERI_CTRL = XOC (for perifery UART and SPI) + Enable
 
     // De-asserts the reset of UART0
-    *REG32(RESETS_BASE + WRITE_SET, 0x0) = BIT(26);        // Set UART0 to reset
-    asm volatile("nop");
-    asm volatile("nop");
     *REG32(RESETS_BASE + WRITE_CLR, 0x0) = BIT(26);        // De-assert the reset from UART0
     while (!(*REG32(RESETS_BASE, 0x08) & BIT(26)));        // Wait for UART0 to be ready
 
