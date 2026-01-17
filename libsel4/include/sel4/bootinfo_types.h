@@ -61,11 +61,13 @@ typedef struct seL4_BootInfo {
     seL4_Word         numIOPTLevels;   /* number of IOMMU PT levels (0 if no IOMMU support) */
     seL4_IPCBuffer   *ipcBuffer;       /* pointer to initial thread's IPC buffer */
     seL4_SlotRegion   empty;           /* empty slots (null caps) */
+#ifdef CONFIG_HAS_VIRTUAL_MEMORY
     seL4_SlotRegion   sharedFrames;    /* shared-frame caps (shared between seL4 nodes) */
     seL4_SlotRegion   userImageFrames; /* userland-image frame caps */
     seL4_SlotRegion   userImagePaging; /* userland-image paging structure caps */
     seL4_SlotRegion   ioSpaceCaps;     /* IOSpace caps for ARM SMMU */
     seL4_SlotRegion   extraBIPages;    /* caps for any pages used to back the additional bootinfo information */
+#endif
     seL4_Word         initThreadCNodeSizeBits; /* initial thread's root CNode size (2^n slots) */
     seL4_Domain       initThreadDomain; /* Initial thread's domain ID */
 #ifdef CONFIG_KERNEL_MCS

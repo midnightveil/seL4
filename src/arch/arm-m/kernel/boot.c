@@ -10,6 +10,8 @@
 #include <object/objecttype.h>
 #include <util.h>
 
+extern char ki_userspace_start[1];
+
 /** This and only this function initialises the CPU.
  *
  * It does NOT initialise any kernel state.
@@ -307,14 +309,15 @@ BOOT_CODE static bool_t try_init_kernel(void)
     /* initialise the IRQ states and provide the IRQ control cap */
     init_irqs(root_cnode_cap);
 
-    populate_bi_frame(0, CONFIG_MAX_NUM_NODES, /* ipcbuf_vptr */ 0x0, 0x0);
+    // XX: ipcbuf_vptr is a physical address heren
+    populate_bi_frame(0, CONFIG_MAX_NUM_NODES, /* ipcbuf_vptr */ rootserver.ipc_buf, 0x0);
 
     /* create the idle thread */
     create_idle_thread();
 
     tcb_t *initial = create_initial_thread(root_cnode_cap,
-                                           /* ui_entry */ 0x20041000 | 1, // or 1 for thumb mode
-                                           /* ui_initial_stack */ 0x20041000,
+                                           /* ui_entry */ (word_t)&ki_userspace_start | 1, // or 1 for thumb mode
+                                           /* ui_initial_stack */ (word_t)rootserver.initial_stack,
                                            /* bootinfo_frame */ rootserver.boot_info);
 
     if (initial == NULL) {
@@ -329,6 +332,9 @@ BOOT_CODE static bool_t try_init_kernel(void)
         printf("ERROR: could not create untypeds for kernel image boot memory\n");
         return false;
     }
+
+    /* finalise the bootinfo frame */
+    bi_finalise();
 
     printf("Booting all finished, dropping to user space\n");
 

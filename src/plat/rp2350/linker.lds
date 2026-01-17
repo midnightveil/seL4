@@ -1,9 +1,6 @@
 #include <config.h>
 #define __ASSEMBLER__
 
-#include <hardware.h>
-#include <arch/machine/hardware.h>
-
 /* Not the vector table because the RP2350 has a bootloader */
 ENTRY(arm_Reset_exception)
 
@@ -76,6 +73,16 @@ SECTIONS
 
         ki_boot_sram_end = .;
     } >SRAM AT>FLASH
+
+    /* Section for userspace application binaries to be loaded into flash.
+     * The kernel will jump to 'ki_userspace_start'. The intention of this
+     * section is to allow you to `objcopy` the userspace binaries into the
+     * kernel ELF, leaving you with an ELF file which you can load to the
+     * board.
+     */
+    .userspace : ALIGN(4) {
+        ki_userspace_start = .;
+    } >FLASH
 
     /DISCARD/ : {
         *(.ARM.exidx)

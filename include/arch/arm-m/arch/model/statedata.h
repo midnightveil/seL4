@@ -6,4 +6,7 @@
 
    @TODO: Confirm the size of this.
  */
-extern char ksArmMIdleThreadStack[50];
+// TODO!
+// for reasons this needs to be aligned!
+#define EXCEPTION_MAX_STACK_SIZE_BITS 6
+extern char ksArmMIdleThreadStack[BIT(EXCEPTION_MAX_STACK_SIZE_BITS)];

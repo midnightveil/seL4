@@ -51,7 +51,7 @@ _relocate_reg_compare:
     @ exit if r2 (addr) >= r4 (end)
     bhs _relocate_reg_done
 
-    @ copy from load to addr
+    @ copy from load to addr and increment
     ldr r5, [r3], #4
     str r5, [r2], #4
 

@@ -198,6 +198,10 @@ BOOT_CODE static word_t calculate_rootserver_size(v_region_t it_v_reg, word_t ex
 #ifdef CONFIG_KERNEL_MCS
     size += BIT(seL4_MinSchedContextBits); // root sched context
 #endif
+    // XXXX
+#ifdef CONFIG_ARCH_ARM_M
+    size += BIT(EXCEPTION_MAX_STACK_SIZE_BITS);
+#endif
     /* for all archs, seL4_PageTable Bits is the size of all non top-level paging structures */
 #ifdef CONFIG_HAS_VIRTUAL_MEMORY
     return size + arch_get_n_paging(it_v_reg) * BIT(seL4_PageTableBits);
@@ -277,6 +281,11 @@ BOOT_CODE static void create_rootserver_objects(pptr_t start, v_region_t it_v_re
 #else /* CONFIG_HAS_VIRTUAL_MEMORY */
     rootserver.boot_info = alloc_rootserver_obj(seL4_BootInfoFrameBits, 1);
     rootserver.tcb = alloc_rootserver_obj(seL4_TCBBits, 1);
+#endif
+
+// XXX
+#ifdef CONFIG_ARCH_ARM_M
+    rootserver.initial_stack = alloc_rootserver_obj(EXCEPTION_MAX_STACK_SIZE_BITS, 1);
 #endif
 
 #ifdef CONFIG_KERNEL_MCS
