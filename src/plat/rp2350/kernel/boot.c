@@ -23,6 +23,10 @@ BOOT_CODE bool_t plat_init_freemem(void)
     res_reg[0] = paddr_to_pptr_reg(get_p_reg_kernel_img());
     int index = 1;
 
+
+    // TODO:
+    // rootserver objs from init data?
+
     return init_freemem(ARRAY_SIZE(normal_memory), normal_memory,
                         index, res_reg,
                         /* the size of the it_v_reg doesn't matter for MPUs */

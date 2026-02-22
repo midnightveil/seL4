@@ -10,6 +10,8 @@
 #include <object/objecttype.h>
 #include <util.h>
 
+#include <sel4/userspace_setup.h>
+
 extern char ki_userspace_start[1];
 
 /** This and only this function initialises the CPU.
@@ -299,7 +301,7 @@ BOOT_CODE static bool_t try_init_kernel(void)
     /* create the root cnode */
     cap_t root_cnode_cap = create_root_cnode();
     if (cap_get_capType(root_cnode_cap) == cap_null_cap) {
-        printf("ERROR: root c-node creation failed\n");
+        printf("ERROR: root cnode creation failed\n");
         return false;
     }
 
@@ -315,8 +317,21 @@ BOOT_CODE static bool_t try_init_kernel(void)
     /* create the idle thread */
     create_idle_thread();
 
+    seL4_UserspaceSetupData_t *setup_data = (void *)&ki_userspace_start;
+
+    if (!((setup_data->magic[0] == LIBSEL4_USERSPACE_SETUP_MAGIC[0]) &&
+          (setup_data->magic[1] == LIBSEL4_USERSPACE_SETUP_MAGIC[1]) &&
+          (setup_data->magic[2] == LIBSEL4_USERSPACE_SETUP_MAGIC[2]) &&
+          (setup_data->magic[3] == LIBSEL4_USERSPACE_SETUP_MAGIC[3]))) {
+        printf("ERROR: userspace setup data magic does not match\n");
+        return false;
+    }
+
+    printf("Userspace setup data:\n");
+    printf("    entrypoint: 0x%"SEL4_PRIx_word"\n", setup_data->entrypoint);
+
     tcb_t *initial = create_initial_thread(root_cnode_cap,
-                                           /* ui_entry */ (word_t)&ki_userspace_start | 1, // or 1 for thumb mode
+                                           /* ui_entry */ (word_t)(setup_data->entrypoint) | 1, // or 1 for thumb mode
                                            /* ui_initial_stack */ (word_t)rootserver.initial_stack,
                                            /* bootinfo_frame */ rootserver.boot_info);
 
