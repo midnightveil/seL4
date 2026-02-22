@@ -329,10 +329,11 @@ BOOT_CODE static bool_t try_init_kernel(void)
 
     printf("Userspace setup data:\n");
     printf("    entrypoint: 0x%"SEL4_PRIx_word"\n", setup_data->entrypoint);
+    printf("    initial sp: 0x%"SEL4_PRIx_word"\n", setup_data->initial_sp);
 
     tcb_t *initial = create_initial_thread(root_cnode_cap,
                                            /* ui_entry */ (word_t)(setup_data->entrypoint) | 1, // or 1 for thumb mode
-                                           /* ui_initial_stack */ (word_t)rootserver.initial_stack,
+                                           /* ui_initial_stack */ (word_t)(setup_data->initial_sp),
                                            /* bootinfo_frame */ rootserver.boot_info);
 
     if (initial == NULL) {

@@ -120,11 +120,6 @@ typedef struct {
 #ifdef CONFIG_HAS_VIRTUAL_MEMORY
     region_t paging;
 #endif
-#ifdef CONFIG_ARCH_ARM_M
-    /* XXX: arch_rootserver_mem_t ?? */
-    /* Cortex-M needs a stack stack for entry/exit to unpriv threads */
-    pptr_t initial_stack;
-#endif
 } rootserver_mem_t;
 
 extern rootserver_mem_t rootserver;

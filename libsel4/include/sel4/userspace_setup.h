@@ -7,4 +7,5 @@
 typedef struct seL4_UserspaceSetupData_ {
     char magic[4];
     seL4_Word entrypoint;
+    seL4_Word initial_sp;
 } seL4_UserspaceSetupData_t;
