@@ -1,7 +1,6 @@
 #include <arch/kernel/boot.h>
 #include <arch/kernel/traps.h>
 #include <arch/machine/registerset.h>
-#include <arch/machine/timer.h>
 #include <kernel/boot.h>
 #include <kernel/thread.h>
 #include <linker.h>
@@ -255,8 +254,6 @@ BOOT_CODE static bool_t init_cpu(void)
     *ACCESSCTRL_REG32(ACCESSCTRL_CLOCKS) |= ACCESSCTRL_PASSWORD | BIT(2);
     *ACCESSCTRL_REG32(ACCESSCTRL_XOSC) |= ACCESSCTRL_PASSWORD | BIT(2);
 #endif
-
-    initTimer();
 
     return true;
 }

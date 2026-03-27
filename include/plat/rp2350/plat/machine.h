@@ -14,6 +14,7 @@
 
 #include <config.h>
 
+#include <drivers/timer/arm_systick.h>
 #include <arch/machine/nvic.h>
 
 // #define TIMER_CLOCK_HZ ULL_CONST(@CONFIGURE_TIMER_FREQUENCY@)
