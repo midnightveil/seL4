@@ -12,7 +12,6 @@
 #include <linker.h>         /* for BOOT_RODATA */
 #include <basic_types.h>    /* for p_region_t, kernel_frame_t (arch/types.h) */
 
-#include <drivers/timer/arm_systick.h>
 #include <arch/machine/nvic.h>
 
 // #define TIMER_CLOCK_HZ ULL_CONST(@CONFIGURE_TIMER_FREQUENCY@)

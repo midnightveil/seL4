@@ -27,6 +27,7 @@ add_sources(
         machine/hardware.c
         machine/nvic.c
         machine/registerset.c
+        machine/systick.c
         machine/thread.c
         api/faults.c
         halt.c
