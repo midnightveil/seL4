@@ -65,48 +65,17 @@ _relocate_regions_done:
 
     bl init_kernel
 
-    @ We can't use the standard restore_user_context() here because that
-    @ assumes we are operating in Handler mode, where as when out of Reset
-    @ we operate in Thread (privileged) mode.
-    @
-    @ We set up all the registers to empty values, then use control to
-    @ switch to non-privileged mode.
+    @ begin initial setup of the idle thread. most of the state has already
+    @ been setup (e.g. MPU)
 
-    @ Load registers from the TCB
-    ldr r0, =ksCurThread /* &NODE_STATE(ksCurThread) */
-    ldr r0, [r0]
-    @ grab the NextIP for the notionally-hardware saved registers, which we've
-    @ set with the value for the initial task
-    ldr lr, [r0, #PT_NextIP]
-    @ offset to the kernel saved
-    adds r0, #PT_R4
-    @ load the kernel-saved (r4-r11), the SP_process into r12, and ignore
-    @ EXC_RETURN.
-    ldm r0, {r4-r11, r12}
-    @ write SP_process to PSP
-    msr PSP, r12
+    @ TODO: I'm lazy.
+    @ TODO: do we wanna switch around PSP/MSP? and xPSR etc?
 
-    @ FPU restore, when desired.
-
-    @ TODO: turn on MPU.
-
-    @ Set up: thread mode unprivileged using SP_process
-    movs r0, #:lower0_7:(CONTROL_nPRIV | CONTROL_SPSEL)
-    msr CONTROL, r0
-    @ "Software must use an ISB barrier instruction to ensure a
-    @  write to the CONTROL register" (per §B1.4.4)
-    isb
-
-    @ zero out r0, r1, r2, r3, r12
-    movs r0, #0
-    movs r1, #0
-    movs r2, #0
-    movs r3, #0
-    movs r12, #0
-
-    @ unfortunately this is a branch-exchange which leaks the current PC into
-    @ the initial thread's LR (R14) register. but this is relatively unimportant.
-    bx lr
+    @ turn on interrupts. technically speaking we could be immediately interrupted
+    @ if SysTick is pending between here and before we execute the branch
+    @ instruction to the idle thread. but this is OK.
+    cpsie i
+    b idle_thread
 END_FUNC(arm_Reset_exception)
 
 /**

@@ -63,9 +63,20 @@ BOOT_CODE static bool_t init_cpu(void)
         return false;
     }
 
-    /* Clear priority and fault masks */
-    MSR("PRIMASK", 0);
+    /* Out of reset we would expect PRIMASK, BASEPRI and FAULTMASK to be 0.
+       However, we do want to disable interrupts (but not faults) within
+       the kernel, so we set PRIMASK.PM (equivalent to cpsid i)
+     */
+#define PRIMASK_PM BIT(0)
+    MSR("PRIMASK", BIT(PRIMASK_PM));
     MSR("FAULTMASK", 0);
+    MSR("BASEPRI", 0);
+    /**
+     * We force a 'Context Synchronisation Event' for the MSR write(s) now
+     * so that we can mess around with interrupts, and their priorities without
+     * being preempted.
+     **/
+    isb();
 
     bool_t haveHWFPU = fp_HWCapTest();
     /* Disable FPU to avoid channels where a platform has an FPU but doesn't make use of it */
@@ -207,7 +218,7 @@ BOOT_CODE static bool_t init_cpu(void)
     *SCB_SHPR3 = /* PRI_12 (DebugMonitor) */ (0 <<  0)
                | /* PRI_13 (reserved)     */ (0 <<  8)
                | /* PRI_14 (PendSV)       */ (SV_PRIORITY << 16)
-               | /* PRI_15 (SysTick)      */ (0 << 24);
+               | /* PRI_15 (SysTick)      */ (SV_PRIORITY << 24);
 
     /**
      * 8. System Handler Control and State Register, SHCSR (B3.2.13)
@@ -257,6 +268,62 @@ BOOT_CODE static bool_t init_cpu(void)
     *ACCESSCTRL_REG32(ACCESSCTRL_CLOCKS) |= ACCESSCTRL_PASSWORD | BIT(2);
     *ACCESSCTRL_REG32(ACCESSCTRL_XOSC) |= ACCESSCTRL_PASSWORD | BIT(2);
 #endif
+
+    /**
+     * Now we want to switch ourselves into 'Handler' mode, so that we can
+     * perform the standard ExceptionReturn into the first task. (We can't
+     * emulate all the features that Handler mode does, such as changing
+     * CONTROL_nPRIV or enabling SysTick without it preempting (or specifically
+     * then turning off PRIMASK without a race condition).
+     * Unfortunately, there's no way to do this in Cortex-M explicitly from
+     * Thread mode, which is what we start in. One way to do this would be
+     * to make the kernel perform an 'SVC' call into itself. This would get us
+     * into Handler mode, but creates its own issue: specifically, we need
+     * to switch out the SVC handler during boot to not have a cost in every
+     * syscall; but doing so requires a duplicate set of vector tables. Which,
+     * would be fine, as they could be thrown away after boot, but is annoying.
+     *
+     *
+     **/
+
+    // FIXME: https://developer.arm.com/documentation/100235/0003/the-cortex-m33-peripherals/system-control-block/system-handler-control-and-state-register?lang=en
+    //       what are the actual requirements? is it just in relation to fault entry/exit
+    //       and having the right stuff to stack (which we do)
+    //
+    // > When updating the SHCSR, Arm recommends using a read-modify-write sequence, to avoid unintended effects on the state of the exception handlers.
+    // ?? atomics? or does it just mean |= ??
+
+
+    // pseudocode: IsActiveForState; SetActive; RawExecutionPriority\
+    // ValidateExceptionReturn
+    //  gets excNumber
+    //      checks isActiveForState
+    //      calls DeActivate
+    //      calls CreateException
+    // Also: ExceptionReturn()
+    //      integer returningExceptionNumber = UInt(IPSR.Exception);
+    //      then validates that number
+
+
+    // B3.22 Exception Return
+    // $R_NCQN$   On exception return the following procedures are carried out:
+    //            - secure mode stuff
+    //            - check that the exception number being returned from, as held in the IPSR, is shown as active
+    //          A check that if the return is to Thread mode, the value that is restored to the IPSR from the RETPSR is zero,
+    //          or that if the return is to Handler mode, the value that is restored to the IPSR from the RETPSR is nonzero. If
+    //          this check fails:
+
+    // what is RETPSR
+
+    // printf("hi\n");
+
+    // *SCB_SHCSR |= SHCSR_PENDSVACT | SHCSR_PENDSVSET;
+    // isb();
+
+    // printf("IPSR: 0x%lx\n", MRS("IPSR"));
+    // printf("SHCSR: 0x%x\n", *SCB_SHCSR);
+
+    // That doesn't work. OK.
 
     return true;
 }
@@ -371,6 +438,12 @@ BOOT_CODE VISIBLE void init_kernel(void)
         fail("ERROR: kernel init failed");
     }
 
-    schedule();
+    assert(NODE_STATE(ksCurThread) == NODE_STATE(ksIdleThread));
+
+    /* To continue the kernel in Handler mode for setup, we switch to
+       the idle thread, which is setup as a privileged thread-mode thread.
+       The jump is done in traps.S assembly directly.
+     */
+    switchToIdleThread();
     activateThread();
 }
