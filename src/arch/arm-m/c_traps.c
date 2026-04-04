@@ -92,7 +92,7 @@ void c_handle_syscall(word_t cptr, word_t msgInfo, syscall_t syscall)
 #ifdef TRACK_KERNEL_ENTRIES
     benchmark_debug_syscall_start(cptr, msgInfo, syscall);
     ksKernelEntry.is_fastpath = 0;
-#endif /* DEBUG */
+#endif /* TRACK_KERNEL_ENTRIES */
 
     slowpath(syscall);
 
@@ -165,4 +165,19 @@ void c_handle_exception(void)
 kernel_abort:
     printf("KERNEL ABORT: exception %"SEL4_PRIu_word"\n", (word_t)exception_number);
     halt();
+}
+
+void c_handle_interrupt(void)
+{
+    c_entry_hook();
+
+#ifdef TRACK_KERNEL_ENTRIES
+    ksKernelEntry.path = Entry_Interrupt;
+    ksKernelEntry.word = IRQT_TO_IRQ(getActiveIRQ());
+    ksKernelEntry.core = CURRENT_CPU_INDEX();
+#endif /* TRACK_KERNEL_ENTRIES */
+
+    handleInterruptEntry();
+
+    c_exit_hook();
 }

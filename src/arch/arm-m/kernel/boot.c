@@ -1,6 +1,7 @@
 #include <arch/kernel/boot.h>
 #include <arch/kernel/traps.h>
 #include <arch/machine/registerset.h>
+#include <arch/machine/timer.h>
 #include <kernel/boot.h>
 #include <kernel/thread.h>
 #include <linker.h>
@@ -324,6 +325,8 @@ BOOT_CODE static bool_t init_cpu(void)
     // printf("SHCSR: 0x%x\n", *SCB_SHCSR);
 
     // That doesn't work. OK.
+
+    initTimer();
 
     return true;
 }
