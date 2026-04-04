@@ -82,14 +82,14 @@ BOOT_CODE static bool_t init_cpu(void)
      * First up is the CPUID register (§B3.2.3). This is RO, so there is nothing to do.
      * It is always implemented and has no usage constraints.
      */
-    VERBOSE_CPU_PRINT("CPUID: 0x%"PRIx32"\n", *SCS_CPUID);
+    VERBOSE_CPU_PRINT("CPUID: 0x%"PRIx32"\n", *SCB_CPUID);
 
     /**
      * 2. The Interrupt Control and State Register, ICSR (B3.2.4)
      * It is always implemented and has no usage constraints.
      * It is R/W with a reset value of 0; there is nothing to configure.
      **/
-    VERBOSE_CPU_PRINT("ICSR: 0x%"PRIx32"\n", *SCS_ICSR);
+    VERBOSE_CPU_PRINT("ICSR: 0x%"PRIx32"\n", *SCB_ICSR);
 
     /**
      * 3. Vector Table Offset Register, VTOR (B3.2.5)
@@ -100,7 +100,7 @@ BOOT_CODE static bool_t init_cpu(void)
      * careful just in case (or in case someone uses a different bootloader).
      **/
 
-    VERBOSE_CPU_PRINT("VTOR (initial): 0x%"PRIx32"\n", *SCS_VTOR);
+    VERBOSE_CPU_PRINT("VTOR (initial): 0x%"PRIx32"\n", *SCB_VTOR);
     /** "Software can write all 1s to the TBLOFF field and then read the register
      *   to find the maximum supported offset value." */
     *SCB_VTOR = UINT32_MAX;
@@ -121,7 +121,7 @@ BOOT_CODE static bool_t init_cpu(void)
     assert((tbloff & VTOR_RESERVED) == 0);
     *SCB_VTOR = tbloff;
 
-    VERBOSE_CPU_PRINT("VTOR (final): 0x%"PRIx32"\n", *SCS_VTOR);
+    VERBOSE_CPU_PRINT("VTOR (final): 0x%"PRIx32"\n", *SCB_VTOR);
 
     /**
      * 4. Application Interrupt and Reset Control Register, AIRCR
@@ -129,7 +129,7 @@ BOOT_CODE static bool_t init_cpu(void)
      * It is RW. Most of these bits control reset, but we do want to configure
      * the priority group binary point. Writing zero to most fields does nothing.
      **/
-    VERBOSE_CPU_PRINT("AIRCR: 0x%"PRIx32"\n", *SCS_AIRCR);
+    VERBOSE_CPU_PRINT("AIRCR: 0x%"PRIx32"\n", *SCB_AIRCR);
     /* VECTKEY, writes must include this */
 #define AIRCR_VECTKEY (0xFA05 << 16)
     /* PRIGROUP, bits[10:8] */
@@ -150,7 +150,7 @@ BOOT_CODE static bool_t init_cpu(void)
      * It is always implemented and there are no usage constraints.
      * It is RW. Reset value is 0x0. This is about various sleep states.
      **/
-    VERBOSE_CPU_PRINT("SCR: 0x%"PRIx32"\n", *SCS_SCR);
+    VERBOSE_CPU_PRINT("SCR: 0x%"PRIx32"\n", *SCB_SCR);
     *SCB_SCR = 0x0;
 
     /**
@@ -158,7 +158,7 @@ BOOT_CODE static bool_t init_cpu(void)
      * It is always implemented and there are no usage constraints.
      * It is RW with ɪᴍᴘʟᴇᴍᴇɴᴛᴀᴛɪᴏɴ ᴅᴇꜰɪɴᴇᴅ reset.
      **/
-    VERBOSE_CPU_PRINT("CCR: 0x%"PRIx32"\n", *SCS_CCR);
+    VERBOSE_CPU_PRINT("CCR: 0x%"PRIx32"\n", *SCB_CCR);
     /**
      * Turn on branch prediction, if we can. Turn on the caches, if we can.
      * Turn on STKALIGN (see notes surrounding KERNEL_STACK_ALIGNMENT).
@@ -175,7 +175,7 @@ BOOT_CODE static bool_t init_cpu(void)
 #define CCR_DIV_0_TRP BIT(4)
     *SCB_CCR = CCR_BP | CCR_IC | CCR_DC | CCR_STKALIGN | CCR_BFHFNMIGN | CCR_DIV_0_TRP;
 
-    VERBOSE_CPU_PRINT("CCR (now): 0x%"PRIx32"\n", *SCS_CCR);
+    VERBOSE_CPU_PRINT("CCR (now): 0x%"PRIx32"\n", *SCB_CCR);
 
     /**
      * 7. System Handler Priority Register 1-3 (B3.2.10 - B3.2.12)
@@ -216,11 +216,14 @@ BOOT_CODE static bool_t init_cpu(void)
      * We want to enable the UsageFault, BusFault, and MemManageFaults.
      * Writing to any of the pending/active is fine as they should all be 0.
      **/
-    VERBOSE_CPU_PRINT("SHCSR: 0x%"PRIx32"\n", *SCS_SHCSR);
+    VERBOSE_CPU_PRINT("SHCSR: 0x%"PRIx32"\n", *SCB_SHCSR);
 
     *SCB_SHCSR = SHCSR_USGFAULTENA | SHCSR_BUSFAULTENA | SHCSR_MEMFAULTENA | SHCSR_SECUREFAULTENA;
 
-    /* Ensure all our writes are in effect */
+    /**
+     * Make sure that writes to the System Control Space registers (in *memory*)
+     *  have completed and are architecturally visible. (B7.2.16 Armv8)
+     **/
     dsb();
     isb();
 

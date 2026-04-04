@@ -125,7 +125,7 @@ static const p_region_t system_control_space_reg BOOT_RODATA = {
 /* D1.2.7 of Armv8-M ARM DDI 0553B.y */
 #define BFSR_BFARVALID BIT(7)
 
-// TODO: ref
+/* D1.2.233 of Armv8-M ARM DDI 0553B.y */
 #ifdef CONFIG_ARCH_ARMV8M
 #define SHCSR_SECUREFAULTENA BIT(19)
 #endif
