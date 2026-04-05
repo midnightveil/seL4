@@ -69,7 +69,7 @@ BOOT_CODE static bool_t init_cpu(void)
        the kernel, so we set PRIMASK.PM (equivalent to cpsid i)
      */
 #define PRIMASK_PM BIT(0)
-    MSR("PRIMASK", BIT(PRIMASK_PM));
+    MSR("PRIMASK", PRIMASK_PM);
     MSR("FAULTMASK", 0);
     MSR("BASEPRI", 0);
     /**
