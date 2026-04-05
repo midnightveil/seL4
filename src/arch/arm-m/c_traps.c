@@ -17,6 +17,7 @@
 #include <kernel/traps.h>
 #include <linker.h>
 #include <model/statedata.h>
+#include <machine/timer.h>
 #include <util.h>
 
 extern char arm_Reset_exception[1] BOOT_CODE;
@@ -112,6 +113,8 @@ void c_handle_exception(void)
     // TODO: check exc_return to see if we can from handle mode, i.e. nested, then goto kernel_abort
     assert(NODE_STATE(ksCurThread) != NULL);
 
+    // TODO: not always valid. maybe c_handle_configurable_fault?
+    //       also, sticky bits.
     word_t CFSR = *SCB_CFSR;
 
     switch (exception_number) {
@@ -151,6 +154,18 @@ void c_handle_exception(void)
 #endif
     case 12: /* DebugMonitor */
         goto kernel_abort;
+
+    case 15: /* SysTick */ {
+
+        /* Like case IRQTimer in handleInterrupt */
+
+        timerTick();
+        resetTimer();
+
+        schedule();
+        activateThread();
+        break;
+    }
 
     // Other numbers should be impossible to go this path.
     default:
