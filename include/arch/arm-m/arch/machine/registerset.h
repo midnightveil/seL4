@@ -69,7 +69,34 @@ enum _register {
 typedef word_t register_t;
 
 typedef struct user_context {
+#ifdef CONFIG_DEBUG_BUILD
+    union {
+#endif
     register_t registers[n_contextRegisters];
+#ifdef CONFIG_DEBUG_BUILD
+        struct {
+            uint32_t r0;
+            uint32_t r1;
+            uint32_t r2;
+            uint32_t r3;
+            uint32_t r12;
+            uint32_t lr;
+            uint32_t pc;
+            uint32_t xPSR;
+            uint32_t r4;
+            uint32_t r5;
+            uint32_t r6;
+            uint32_t r7;
+            uint32_t r8;
+            uint32_t r9;
+            uint32_t r10;
+            uint32_t r11;
+            uint32_t sp;
+            uint32_t exc_return;
+            uint32_t fault_ip;
+        } registers_named_for_debug;
+    };
+#endif
 } user_context_t;
 
 
