@@ -189,6 +189,13 @@ static inline void Arch_initContext(user_context_t *context)
                                    | /* exception sec = 1*/ (1 ? BIT(0) : 0);
                                    // | /* exception sec = 1*/ (0 ? BIT(0) : 0);
 
+    /**
+     * Pick a value for the link register that would cause a fault.
+     * We use the value that the CPU would set on Warm reset for the LR,
+     * per $R_{PLRT}$ of Armv8-M ARM DDI 0553B.y (§B3.3).
+     **/
+    context->registers[LR] = 0xFFFFFFFF;
+
     context->registers[xPSR] = BIT(24); // thumb mode
 }
 
