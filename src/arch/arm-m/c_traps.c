@@ -111,6 +111,7 @@ void c_handle_exception(void)
     uint8_t exception_number = IPSR & 0xf;
 
     // TODO: check exc_return to see if we can from handle mode, i.e. nested, then goto kernel_abort
+    assert(NODE_STATE(ksCurThread) != NULL);
 
     word_t CFSR = *SCB_CFSR;
 
