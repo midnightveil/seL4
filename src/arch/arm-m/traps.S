@@ -160,8 +160,3 @@ END_FUNC(arm_SVCall_exception)
 BEGIN_FUNC(arm_PendSV_exception)
     b halt
 END_FUNC(arm_PendSV_exception)
-
-BEGIN_FUNC(arm_SysTick_exception)
-    b halt
-END_FUNC(arm_SysTick_exception)
-

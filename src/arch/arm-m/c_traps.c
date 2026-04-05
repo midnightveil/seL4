@@ -24,7 +24,6 @@ extern char arm_Reset_exception[1] BOOT_CODE;
 extern char arm_handle_exception[1];
 extern char arm_SVCall_exception[1];
 extern char arm_PendSV_exception[1];
-extern char arm_SysTick_exception[1];
 
 /**
  * Read the Armv7-M exception model, B1.5 of Armv7-M ARM DDI 0403E.e.
@@ -58,7 +57,7 @@ word_t arm_vector_table[16] ALIGN(128) SECTION(".vectors") = {
     [12] = (word_t)&arm_handle_exception, /* DebugMonitor */
     [13] = 0 /* Reserved */,
     [14] = (word_t)&arm_PendSV_exception,
-    [15] = (word_t)&arm_SysTick_exception,
+    [15] = (word_t)&arm_handle_exception, /* SysTick */
 };
 
 void slowpath(syscall_t syscall)
