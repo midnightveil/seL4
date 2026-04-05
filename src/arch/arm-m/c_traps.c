@@ -155,7 +155,7 @@ void c_handle_exception(void)
 
     // Other numbers should be impossible to go this path.
     default:
-        assert("unreachable");
+        assert(!"unreachable");
         break;
     }
 
