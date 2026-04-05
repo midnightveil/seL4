@@ -29,10 +29,15 @@ extern const register_t fault_messages[][MAX_MSG_SIZE] VISIBLE;
 static inline void setRegister(tcb_t *thread, register_t reg, word_t w)
 {
     thread->tcbArch.tcbContext.registers[reg] = w;
+
+    // TEMP: Hack.
+    void Arch_postModifyRegisters(tcb_t *tptr);
+    Arch_postModifyRegisters(thread);
 }
 
 static inline word_t PURE getRegister(tcb_t *thread, register_t reg)
 {
+    // TODO: read out from hw?
     return thread->tcbArch.tcbContext.registers[reg];
 }
 

@@ -22,7 +22,9 @@ void Arch_postModifyRegisters(tcb_t *tptr)
     word_t SP = getRegister(tptr, SP_process);
     // TODO: check if PSP has gone away, lol.
     /// xxx: EXC_RETURN useful?
-    assert(SP > 0x20000000 && SP < 0x20082000);
+    if (SP < 0x20000000 || SP >= 0x20082000) {
+        return;
+    };
 
     /* The current stack pointer points to the bottom of the stack */
     word_t *frame = (word_t *)SP;
