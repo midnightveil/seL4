@@ -32,12 +32,21 @@
 #define SYST_CSR_CLKSOURCE BIT(2)
 
 /**
+ * SysTick supports a ten millisecond reload value from the calibration register.
+ * Make our lives easy.
+ **/
+compile_assert(kernel_timer_tick_is_tenms, CONFIG_TIMER_TICK_MS == 10);
+
+/**
  * Initialise the timer as per $I_{PPGV}$ (§B11 of Armv8-M ARM DDI 0553B.y)
  **/
 BOOT_CODE void initTimer(void) {
+    const uint32_t tenms = *SYST_CALIB & SYST_CALIB_TENMS_MASK;
+    assert(tenms != 0);
+
     // TODO: use the kernel tick settings (currently is 10ms / 100Hz)
     /* Set the reload value */
-    *SYST_RVR = *SYST_CALIB & SYST_CALIB_TENMS_MASK;
+    *SYST_RVR = tenms;
 
     /* Clear the current count */
     *SYST_CVR = 0x0;

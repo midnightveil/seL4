@@ -19,6 +19,8 @@ set(KernelOptimisation "-Os" CACHE STRING "")
 set(KernelFastpath OFF CACHE BOOL "")
 set(KernelMaxNumBootinfoUntypedCaps 50 CACHE STRING "")
 
+set(KernelTimerTickMS "10" CACHE STRING "")
+
 # TODO: Split by arm-8/arm-7
 add_sources(
     DEP "KernelArchArmM"

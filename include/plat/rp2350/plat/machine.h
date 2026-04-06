@@ -16,8 +16,6 @@
 
 #include <arch/machine/nvic.h>
 
-// #define TIMER_CLOCK_HZ ULL_CONST(@CONFIGURE_TIMER_FREQUENCY@)
-
 // TODO: These numbers are fake
 
 enum IRQConstants {
