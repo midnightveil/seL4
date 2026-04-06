@@ -65,17 +65,71 @@ _relocate_regions_done:
 
     bl init_kernel
 
-    @ begin initial setup of the idle thread. most of the state has already
-    @ been setup (e.g. MPU)
+    @ In order to begin execution of userspace, we want to transition to an
+    @ unprivileged thread mode (difficult to do directly, as enabling interrupts
+    @ or configuring other processor state (e.g. MPU or SP_SEL) and setting
+    @ CONTROL_nPRIV are two different non-atomic operations). We can do this
+    @ from 'Handler mode' via 'Exception Return', but now the problem becomes
+    @ how to transition into Handler mode.
+    @
+    @ Arm-M does not provide explicit control over the current execution mode,
+    @ per §E.2.1.81 'CurrentMode' of Armv8-M ARM DDI 0553B.y it is solely
+    @ dependent on the current value of the IPSR.Exception field, which is
+    @ only adjusted during exception entry/return: §E2.1.16 'ActiveException'.
+    @
+    @ One solution to this problem (taken e.g. by OxideComputer's Hubris [1]
+    @ or by ARM in their 'Interrupt Deprivileging' [2] examples) is to perform
+    @ an SVC at the end of kernel initialisation, which has either a runtime
+    @ system call cost (in checking for this state) or needs faffing around with
+    @ replacing entries of the vector table.
+    @
+    @ The solution we take is based off ARM's 'context-switch-fp' demonstrator
+    @ from the 'Armv8-M Architecture - User Guide Examples' GitHub repository
+    @ (https://github.com/ARM-software/m-profile-user-guide-examples), which
+    @ instead treats initialisation as part of the idle task, using the SysTick
+    @ interrupt to *then* switch to the root task.
+    @
+    @ FIXME: Having written all of this, I have realised that this has the exact
+    @        same problem as originally: we can't enable interrupts *and* setup
+    @        nPRIV at the same time.... the only different that the
+    @        'context-switch-fp' example has is that it resets the SysTick timer
+    @        immediately before, meaning it is highly unlikely that it fires.
+    @        But I could have done this originally...
 
-    @ TODO: I'm lazy.
-    @ TODO: do we wanna switch around PSP/MSP? and xPSR etc?
+    @ TODO: What makes userspace threads be nPRIV? => NOTHING!
 
-    @ turn on interrupts. technically speaking we could be immediately interrupted
-    @ if SysTick is pending between here and before we execute the branch
-    @ instruction to the idle thread. but this is OK.
+    ldr r0, =ksCurThread /* &NODE_STATE(ksCurThread) */
+    ldr r0, [r0]
+    @ offset to the kernel saved registers
+    adds r0, #PT_R4
+    @ load the kernel-saved registers (r4-r11, SP [into r12], but not EXC_RETURN)
+    ldm r0, {r4-r11, r12}
+    @ write SP_process to PSP
+    msr PSP, r12
+    isb
+
+    @ switch to using SP_process now for the idle thread.
+    mrs r0, CONTROL
+    orr r0, #(CONTROL_SPSEL)
+    msr CONTROL, r0
+    isb
+
+    @ pop the 'hardware-saved' registers off the stack.
+    @ this replaces our temporary $r0 with the one from the register context;
+    ldm sp, {r0-r3, r12, lr}
+    @ increment the stack pointer to the top of the idle thread stack.
+    @ we can't use ldm sp! because we can't pop PC and xPSR.
+    @ framesize = 0x20
+    add sp, #0x20
+
+    @ Turn on interrupts. We may not have enough time before SysTick fires
+    @ to actually get into the main idle thread loop -- however, this should
+    @ be fine as we are otherwise ready to run the root task.
     cpsie i
+
     b idle_thread
+    @ if we got here something bad happened
+    udf #0xff
 END_FUNC(arm_Reset_exception)
 
 /**
@@ -112,6 +166,7 @@ BEGIN_FUNC(arm_handle_exception)
     @ write SP_process to PSP
     msr PSP, r12
 
+    @ TODO: do we need isb to PSP write above?
     @ hardware will restore r0-r3, r12, and others
     bx lr
 END_FUNC(arm_handle_exception)

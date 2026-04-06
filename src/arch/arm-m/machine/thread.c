@@ -23,17 +23,12 @@ BOOT_CODE void Arch_configureIdleThread(tcb_t *tcb)
 {
     Arch_initContext(&tcb->tcbArch.tcbContext);
 
-    /**
-     * Note: parts of this are configured at the end of init_kernel, because
-     * we use the idle thread's ability to take interrupts as a trampoline to
-     * jump the kernel into Handler Mode.
-     **/
-
     setRegister(tcb, NextIP, (word_t)&idle_thread);
-    /* Note: we set this to the bottom of the stack, because we are emulating
-       an idle thread which has already *had* its registers stacked upon entry,
-       and unstacking will increase the SP.
-     */
+    /**
+     * Note: we set this to the bottom of the stack, because we are emulating
+     * an idle thread which has already *had* its registers stacked upon entry,
+     * and unstacking will increase the SP.
+     **/
     setRegister(tcb, SP_process, (word_t)&ksArmMIdleThreadStack);
 
     Arch_postModifyRegisters(tcb);
