@@ -31,19 +31,21 @@
 #define SYST_CSR_TICKINT   BIT(1)
 #define SYST_CSR_CLKSOURCE BIT(2)
 
+/**
+ * Initialise the timer as per $I_{PPGV}$ (§B11 of Armv8-M ARM DDI 0553B.y)
+ **/
 BOOT_CODE void initTimer(void) {
-    // TODO: use the kernel tick settings
+    // TODO: use the kernel tick settings (currently is 10ms / 100Hz)
     /* Set the reload value */
     *SYST_RVR = *SYST_CALIB & SYST_CALIB_TENMS_MASK;
 
+    /* Clear the current count */
+    *SYST_CVR = 0x0;
+
     /* Enable the counter, enable the tick interrupt, use the PE clock */
     *SYST_CSR = SYST_CSR_ENABLE | SYST_CSR_TICKINT | SYST_CSR_CLKSOURCE;
-    resetTimer();
 }
 
 static inline void resetTimer(void) {
-    /* Per I_VHDT, writing to SYST_CVR clears SYST_CVR and SYST_CSR.COUNTFLAG.
-       Any value can be written here and it will be cleared.
-    */
-    *SYST_CVR = 0x0;
+    /* Nothing to do - SysTick automatically reloads from the RVR register */
 }
