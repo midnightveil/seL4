@@ -441,12 +441,6 @@ BOOT_CODE VISIBLE void init_kernel(void)
         fail("ERROR: kernel init failed");
     }
 
-    assert(NODE_STATE(ksCurThread) == NODE_STATE(ksIdleThread));
-
-    /* To continue the kernel in Handler mode for setup, we switch to
-       the idle thread, which is setup as a privileged thread-mode thread.
-       The jump is done in traps.S assembly directly.
-     */
-    switchToIdleThread();
+    schedule();
     activateThread();
 }

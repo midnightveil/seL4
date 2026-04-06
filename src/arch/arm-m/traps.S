@@ -83,21 +83,26 @@ _relocate_regions_done:
     @ system call cost (in checking for this state) or needs faffing around with
     @ replacing entries of the vector table.
     @
-    @ The solution we take is based off ARM's 'context-switch-fp' demonstrator
+    @ Another solution we attempted was ARM's 'context-switch-fp' demonstrator
     @ from the 'Armv8-M Architecture - User Guide Examples' GitHub repository
     @ (https://github.com/ARM-software/m-profile-user-guide-examples), which
     @ instead treats initialisation as part of the idle task, using the SysTick
-    @ interrupt to *then* switch to the root task.
+    @ interrupt to *then* switch to the root task in Handler mode. However,
+    @ this really has the same problem: turning on CONTROL_nPRIV races with
+    @ the SysTick timer firing. It is, in fact, worse than the original
+    @ emulation of exception return as now if an interrupt happens then
+    @ CONTROL_nPRIV may never end up being set until the idle thread runs...
+    @ which might be a *while* away, as the root task generally does a lot of
+    @ initialisation.
     @
-    @ FIXME: Having written all of this, I have realised that this has the exact
-    @        same problem as originally: we can't enable interrupts *and* setup
-    @        nPRIV at the same time.... the only different that the
-    @        'context-switch-fp' example has is that it resets the SysTick timer
-    @        immediately before, meaning it is highly unlikely that it fires.
-    @        But I could have done this originally...
+    @ In the end, what we've decided on is that some of the following code is
+    @ notionally 'part' of the root task. Specifically, when we setup the
+    @ registers we can do this as part of our trusted code loading off the
+    @ process stack. At this point the MPU will have been set up by kernel -
+    @ but because this is located in the .boot.text, which is part of the
+    @ memory userspace is given access to, this is fine.
 
-    @ TODO: What makes userspace threads be nPRIV? => NOTHING!
-
+    @ Load the amount of data we need to get out of the kernel into registers
     ldr r0, =ksCurThread /* &NODE_STATE(ksCurThread) */
     ldr r0, [r0]
     @ offset to the kernel saved registers
@@ -108,28 +113,41 @@ _relocate_regions_done:
     msr PSP, r12
     isb
 
-    @ switch to using SP_process now for the idle thread.
+    @ switch to using SP_process now.
     mrs r0, CONTROL
     orr r0, #(CONTROL_SPSEL)
+    msr CONTROL, r0
+    isb
+
+    @ Turn on interrupts. We are still in privileged thread mode, however,
+    @ we are running on the process stack and no longer need to access anything
+    @ from kernel data structures; so if we are interrupted into the kernel,
+    @ nothing bad will happen. This is also because there is only one runnable
+    @ thread at the moment: us. Any forward progress the system can make must
+    @ be towards the setting of CONTROL_nPRIV next - it is not possible to enter
+    @ state where other threads progress in privileged modes.
+    cpsie i
+
+    @ Switch to unprivileged mode now. From here on we are a "true" userspace
+    @ task.
+    mrs r0, CONTROL
+    orr r0, #(CONTROL_nPRIV)
     msr CONTROL, r0
     isb
 
     @ pop the 'hardware-saved' registers off the stack.
     @ this replaces our temporary $r0 with the one from the register context;
     ldm sp, {r0-r3, r12, lr}
-    @ increment the stack pointer to the top of the idle thread stack.
+    @ increment the stack pointer to the top of the stack.
     @ we can't use ldm sp! because we can't pop PC and xPSR.
     @ framesize = 0x20
     add sp, #0x20
 
-    @ Turn on interrupts. We may not have enough time before SysTick fires
-    @ to actually get into the main idle thread loop -- however, this should
-    @ be fine as we are otherwise ready to run the root task.
-    cpsie i
-
-    b idle_thread
-    @ if we got here something bad happened
-    udf #0xff
+    @ jump to thread entrypoint by reading the pc off the stack.
+    @ PT_R4 is the offset of the top of the hardware-stacked registers (which
+    @ happens to be R4) and NextIP is the offset of the PC, so we move
+    @ down the difference in position down from the top of the stack.
+    ldr pc, [sp, #(PT_NextIP - PT_R4)]
 END_FUNC(arm_Reset_exception)
 
 /**
